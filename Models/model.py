@@ -1,6 +1,6 @@
-from site import ENABLE_USER_SITE
 import sqlite3
-con = sqlite3.connect('projeto.db')
+from xmlrpc.client import DateTime
+con = sqlite3.connect('projeto.db', isolation_level=None)
 cur = con.cursor()
 
 def checkUser(username, password):
@@ -17,3 +17,9 @@ def checkAdmin(username, password):
     else:
         return False
     
+def inserir_nova_data(name, date):
+    cur.execute(f"INSERT INTO Datas (data, espetaculo) VALUES('{DateTime(date)}', '{name}')")
+    
+def change_password(username, password):
+    print(username)
+    cur.execute(f"UPDATE Users SET password='{password}' WHERE username='{username}'")
