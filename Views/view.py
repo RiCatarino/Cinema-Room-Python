@@ -1,15 +1,30 @@
 from pickle import NONE
+from posixpath import split
+from pydoc import apropos
 import sqlite3
 from xmlrpc.client import DateTime
 from Models import model
 from Controllers import controller
-con = sqlite3.connect('projeto.db')
+con = sqlite3.connect('projeto.db', isolation_level=None)
 cur = con.cursor()
 
 currentuser = ""
 letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
+letras.reverse()
 sala = []
 
+sala_backup = [[" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", "   ", "   ", "   ", "VIP", "VIP", "VIP", "VIP", "   ", "   ", "   ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+        [" ▢ ", " ▢ ", "   ", "   ", "   ", "VIP", "VIP", "VIP", "VIP", "   ", "   ", "   ", " ▢ ", " ▢ "],
+]
 
 def main():
     while True:
@@ -44,6 +59,8 @@ def menuUser():
     option = input("Opção: ")
     if int(option) == 1:
         reservar_bilhetes()
+    elif int(option) == 2:
+        alterar_reserva()
         
 def login():
     global currentuser
@@ -103,16 +120,22 @@ def listar_datas_espetaculo(nome):
     print("\t--------------")
 
 def listar_datas_espetaculo_para_reserva(nome):
-    print(f"\n------ Datas do espetáculo {nome} ----")
-    print("\n\t--------------")
+
     datas = []
     for date in cur.execute(f"SELECT data FROM Datas WHERE espetaculo='{nome}'"):
         datas.append(date[0])
-    for i in range(0, len(datas)):
-        print(f"\t| {i+1}: {datas[i]} |")
-    print("\t--------------")
-    option = input("\n Qual data pretende? ")
-    return datas[int(option)-1]
+    
+    if datas != []:
+        print(f"\n------ Datas do espetáculo {nome} ----")
+        print("\n\t--------------")
+        for i in range(0, len(datas)):
+            print(f"\t| {i+1}: {datas[i]} |")
+        print("\t--------------")
+        option = input("\n Qual data pretende? ")
+        return datas[int(option)-1]
+    else:
+        print("Não há datas para este evento.")
+        reservar_bilhetes()
 
 def inserir_nova_data(nome_espetaculo):
     if nome_espetaculo == None:
@@ -163,29 +186,259 @@ def alterar_password():
         alterar_password()
 
 
-def mostrar_sala(result):
-    for i in range (0, 11):
-        sala.append([" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "])
+def mostrar_sala():
+    print("\n\t\t\t\033[95m   ESTADO DA SALA")
+    print("\033[94m|---------------------------------------------------------------------|")
+    print("|     1   2      3   4   5   6   7   8   9   10  11  12     13  14    |")
     for i in range(0, 11):
         for k in range(1):
-            if i == 5:
-                print(letras[i] sala[i][k], sala[i][k+1], "              ", "VIP", "VIP", "VIP", "VIP", "              ", sala[i][k+12], sala[i][k+13])
+            if i == 6 or i ==10:
                 print()
-            elif i == 10:
-                print() 
-                print(sala[i][k], sala[i][k+1], "              ", "VIP", "VIP", "VIP", "VIP", "              ", sala[i][k+12], sala[i][k+13])
-            else:
-                print(sala[i][k], sala[i][k+1], "  ", sala[i][k+2], sala[i][k+3], sala[i][k+4], sala[i][k+5], sala[i][k+6], sala[i][k+7], sala[i][k+8], sala[i][k+9], sala[i][k+10], sala[i][k+11], "  ", sala[i][k+12], sala[i][k+13])
-
+            print("|",letras[i], "\033[0m" ,sala[i][k], sala[i][k+1], "  ", sala[i][k+2], sala[i][k+3], sala[i][k+4], sala[i][k+5], sala[i][k+6], sala[i][k+7], sala[i][k+8], sala[i][k+9], sala[i][k+10], sala[i][k+11], "  ", sala[i][k+12], sala[i][k+13],"\033[94m" , letras[i], "|")
+    print("\n\t   |----------------------------------------------------------|")
+    print("\t   |\t\t\t\t\t\t\t      |")
+    print("\t   |\t\t\t PALCO \t\t\t\t      |")
+    print("\t   |\t\t\t\t\t\t\t      |")
+    print("\t   |----------------------------------------------------------|\033[0m")
+    
 def reservar_bilhetes():
     espetaculo = listar_espetaculos()
     data = listar_datas_espetaculo_para_reserva(espetaculo)
-    cur.execute(f"SELECT reservas FROM Datas WHERE data='{DateTime(data)}' AND espetaculo='{espetaculo}'")
+    cur.execute(f"SELECT reservas FROM User_Espetaculos_Reservas WHERE data='{DateTime(data)}' AND espetaculo='{espetaculo}'")
     result = cur.fetchall()
-    print(result)
-    mostrar_sala(result)
-    lugares = []
-    quantidade = int(input("Quantos lugares pretende reservar? "))
-    for i in range(0, quantidade+1):
-        lugar = input("Escola o lugar: ")
-        lugares.append(lugar)
+    result_merged = [""]
+    for i in range(0, len(result)):
+            result_merged[0] += (result[i][0])
+    lugares =[]
+    if len(result) > 0:
+        lugaresreservados = result_merged[0].split(" ")
+        lugares = result_merged[0].split(" ")
+        controller.convert_letters_in_numbers(lugaresreservados, letras)
+    else:
+        global sala
+        sala = sala_backup
+    if not controller.check_if_is_full():
+        mostrar_sala()
+        isnum = False
+        while not isnum:
+            quantidade = input("\nQuantos lugares pretende reservar? ")
+            if quantidade.isnumeric():
+                if int(quantidade) > 0:
+                    quantidade = int(quantidade)
+                    isnum = True
+                else:
+                    print("\033[91mTem de inserir um número maior que 0.\033[0m")
+            else:
+                print("\033[91mTem de inserir um número válido.\033[0m")
+                
+        manual_or_auto = input("Pretende a escolha manual ou automática? (Manual/Auto):")
+        if manual_or_auto == "Manual":
+            novareserva = escolha_manual(quantidade, lugares)
+        elif manual_or_auto == "Auto":
+            novareserva = escolha_auto(quantidade)
+                
+        tosql = ""
+        for item in novareserva:
+            if tosql == "":
+                tosql += item
+            else:
+                tosql += " " + item
+        cur.execute(f"INSERT INTO User_Espetaculos_Reservas(username, espetaculo, data, reservas) VALUES('{currentuser}', '{espetaculo}', '{DateTime(data)}', '{tosql} ')")
+        print("\n----------Lugares reservados com sucesso----------")
+        menuUser()
+    else:
+        print("\n\033[91mPedimos desculpa, mas a sala encontra-se esgotada.\033[0m")
+    
+def escolha_manual(quantidade, lugares):
+    novareserva = []
+    for i in range(0, quantidade):
+        count_to_approve = 0
+        while count_to_approve <3:
+            lugar = input("Escolha o lugar: ")
+            if controller.check_letra(lugar):
+                if lugar in lugares or lugar in novareserva:
+                    print("\n\033[91mALERTA: Esse lugar já está escolhido.\n\033[0m")
+                else:
+                    count_to_approve +=1                
+                if ((lugar[0] == "A" or lugar[0] == "F") and ((int(lugar[1:3]) > 2  and int(lugar[1:3]) < 6) or (int(lugar[1:3]) > 9  and int(lugar[1:3]) < 13))) :
+                    print("\n\033[91mALERTA: Esse lugar não existe.\n\033[0m")
+                else:
+                    count_to_approve +=1    
+                novareserva.append(lugar)
+                count_to_approve +=1    
+            else:
+                print("\n\033[91mO lugar que inseriu não está correto.\n\033[0m")
+    return novareserva
+    
+
+def escolha_auto(quantidade):
+    novareserva = []
+    if quantidade == 1:
+        novareserva = look_for_one(quantidade)
+        return novareserva
+    elif quantidade % 2 == 0 and quantidade > 1:
+        novareserva = look_for_even(quantidade)
+        return novareserva
+    elif quantidade % 2 != 0 and quantidade > 1:
+        novareserva = look_for_odd(quantidade)
+        print(novareserva)
+        return novareserva
+    else:
+        input()
+
+def look_for_one(quantidade):
+    novareserva = []
+    for i in range(0, 11):
+        for j in range(0,13):
+            if sala[i][j] == " ▢ ":
+                novareserva.append(f"{letras[i]}{j+1}")
+                return novareserva
+    return False
+
+def look_for_even(quantidade):
+    novareserva = []
+    count = 0
+    for i in range(0, 11):
+        if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
+            novareserva.append(f"{letras[i]}{1}")
+            novareserva.append(f"{letras[i]}{2}")
+            count += 2
+        if count == quantidade:
+            return novareserva
+    for i in range(0, 11):
+        if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+            novareserva.append(f"{letras[i]}{13}")
+            novareserva.append(f"{letras[i]}{14}")
+            count += 2
+        if count == quantidade:
+            return novareserva
+    for i in range(0, 11):
+        for j in range(2, 12):
+            if (sala[i][j] == " ▢ " and sala[i][j+1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j+1] == "VIP"):
+                if f"{letras[i]}{j+1}" in novareserva:
+                    pass
+                else:
+                    novareserva.append(f"{letras[i]}{j+1}")
+                    novareserva.append(f"{letras[i]}{j+2}")
+                    count += 2
+            if count == quantidade:
+                return novareserva
+    for i in range(0, 11):
+            for j in range(0, 13):
+                if sala[i][j] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{j+1}")
+                    count += 1
+                if count == quantidade:
+                    return novareserva
+                        
+
+def look_for_odd(quantidade):
+    novareserva = []
+    count = 0
+    
+    countall = 0
+    for i in range(0, 11):
+        for j in range(2, 12):
+            if j+quantidade <12:
+                countall = 0
+                for k in range(j, j+quantidade):
+                    if (sala[i][j] == " ▢ " or sala[i][j] == "VIP"):
+                        countall += 1
+                    if countall == quantidade:
+                        for n in range(j, j+quantidade):
+                            novareserva.append(f"{letras[i]}{n+1}")
+                        return novareserva
+            
+    print(novareserva)
+    for i in range(0, 11):
+        for j in range(2, 12):
+            if (sala[i][j] == " ▢ " and sala[i][j+1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j+1] == "VIP"):
+                if f"{letras[i]}{j+1}" in novareserva:
+                    pass
+                else:
+                    novareserva.append(f"{letras[i]}{j+1}")
+                    novareserva.append(f"{letras[i]}{j+2}")
+                    count += 2
+            if count == quantidade:
+                return novareserva
+    print("center:", novareserva)
+            
+    if (quantidade - count) % 2 != 0 and (quantidade - count) > 1:
+        for i in range(0, 11):
+            if (quantidade - count) > 1: #SE AINDA SOBRAR MAIS QUE UMA PESSOA
+                if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
+                        novareserva.append(f"{letras[i]}{1}")
+                        novareserva.append(f"{letras[i]}{2}")
+                        count += 2
+                if count == quantidade:
+                    return novareserva
+            else:
+                if sala[i][0] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{1}")
+                    return novareserva
+                elif sala[i][0] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{2}")
+                    return novareserva
+        print("left:", novareserva)
+
+        for i in range(0, 11):
+            if (quantidade - count) > 1: #SE AINDA SOBRAR MAIS QUE UMA PESSOA
+                if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{13}")
+                    novareserva.append(f"{letras[i]}{14}")
+                    count += 2
+                if count == quantidade:
+                    return novareserva
+            else:
+                if sala[i][0] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{1}")
+                    return novareserva
+                elif sala[i][0] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{2}")
+                    return novareserva
+        print("right:", novareserva)
+                
+        for i in range(0, 11):
+            for j in range(0, 13):
+                if sala[i][j] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{j+1}")
+                    count += 1
+                if count == quantidade:
+                    return novareserva     
+    else:
+        for i in range(0, 11):
+                if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
+                        novareserva.append(f"{letras[i]}{1}")
+                        novareserva.append(f"{letras[i]}{2}")
+                        count += 2
+                if count == quantidade:
+                    return novareserva
+                
+        for i in range(0, 11):
+                if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{13}")
+                    novareserva.append(f"{letras[i]}{14}")
+                    count += 2
+                if count == quantidade:
+                    return novareserva
+        for i in range(0, 11):
+            for j in range(0, 13):
+                if sala[i][j] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{j+1}")
+                    count += 1
+                if count == quantidade:
+                    return novareserva     
+    print(novareserva)
+            
+    
+        
+        
+    
+    
+    
+    
+def alterar_reserva():
+    espetaculo = listar_espetaculos()
+    for item in cur.execute(f"SELECT data, reservas FROM User_Espetaculos_Reservas WHERE username='{currentuser}' AND espetaculo='{espetaculo}'"):
+        print("Data: ", item[0], "Bilhetes: ", item[1])
+    
