@@ -7,7 +7,7 @@ cur = con.cursor()
 
 
 def inserir_nova_data(name, date):
-    cur.execute(f"SELECT * FROM Datas WHERE data='{DateTime(date)}' AND espetaculo='{name}'")
+    cur.execute(f"SELECT * FROM Datas_espetaculo WHERE data='{DateTime(date)}' AND espetaculo='{name}'")
     result = cur.fetchone()
     if result:
         print("Este espetáculo já tem uma sessão nessa data.")
@@ -44,7 +44,7 @@ def convert_letters_in_numbers(lista, letras):
                 lista[i] = lista[i].replace(str(letras[k]), str(letras.index(letras[k])) + " ")
     list_to_print =[]
     view.sala = view.sala_backup
-    for item in range(0, len(lista) -1):
+    for item in range(0, len(lista)):
         list_to_print.append(str(lista[item]).split(" "))
     for item in range(0, len(list_to_print)):
         if list_to_print[item] != ['']:
@@ -56,3 +56,16 @@ def check_if_is_full():
             if view.sala[i][j] == " ▢ ":
                 return False
     return True
+
+def get_total_bilheteira(datas):
+    reservas = []
+    total = 0
+    for i in range(0, len(datas)):
+        for item in cur.execute(f"SELECT lugar FROM User_espetaculo_lugar WHERE data_espetaculo='{datas[i]}'"):
+            reservas.append(item[0])    
+    for item in reservas:
+        if item == "F6" or item == "F7" or item == "F8" or item == "F8" or item == "A6" or item == "A7" or item == "A8" or item == "A9":
+            total += 12
+        else: 
+            total += 4        
+    return total

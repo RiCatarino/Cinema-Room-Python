@@ -18,8 +18,7 @@ def checkAdmin(username, password):
         return False
     
 def inserir_nova_data(name, date):
-    cur.execute(f"INSERT INTO Datas (data, espetaculo) VALUES('{DateTime(date)}', '{name}')")
+    cur.execute(f"INSERT INTO Datas_espetaculo (data, espetaculo) VALUES('{DateTime(date)}', '{name}')")
     
 def change_password(username, password):
-    print(username)
     cur.execute(f"UPDATE Users SET password='{password}' WHERE username='{username}'")

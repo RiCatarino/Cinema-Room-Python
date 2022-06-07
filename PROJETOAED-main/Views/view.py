@@ -1,11 +1,6 @@
-from pickle import NONE
-from posixpath import split
-from pydoc import apropos
 import sqlite3
-from xmlrpc.client import DateTime
 from Models import model
 from Controllers import controller
-import numpy as np
 
 con = sqlite3.connect('projeto.db', isolation_level=None)
 cur = con.cursor()
@@ -28,7 +23,6 @@ sala_backup = [[" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", "
                [" ▢ ", " ▢ ", "   ", "   ", "   ", "VIP", "VIP", "VIP", "VIP", "   ", "   ", "   ", " ▢ ", " ▢ "],
                ]
 
-
 def main():
     print("\n-----COOLISEU-----")
     menu_inicial()
@@ -47,32 +41,48 @@ def menu_inicial():
 
 def menuAdmin():
     print(
-        "\n1. Inserir Espetáculo\n2. Inserir nova data do espetáculo\n3. Alterar password de um cliente\n4. Alterar password\n5. Registar novo administrador")
-    optionstr = input("Opção:")
-    option = int(optionstr)
+        "\n1. Inserir Espetáculo\n2. Inserir nova data do espetáculo\n3. Bilheteira \n4. Alterar password de um cliente\n5. Alterar password\n6. Registar novo administrador")
+    option = int(input("Opção:"))
     if option == 1:
         inserir_espetaculo()
     elif option == 2:
         inserir_nova_data(None)
     elif option == 3:
-        alterar_password_by_utilizador(False, None)
+        menuBilheteira()
     elif option == 4:
-        alterar_password()
+        alterar_password_by_utilizador(False, None)
     elif option == 5:
+        alterar_password()
+    elif option == 6:
         signup("Admin")
 
-
+def menuBilheteira():
+    print(
+        "\n1. Valor por dia \n2. Valor por mês\n3. Valor por ano \n4. Valor por espetáculo \n5. Valor por sessão\n")
+    option = int(input("Opção:"))
+    if option == 1:
+        bilheteira_por_dia()
+    elif option == 2:
+        bilheteira_por_mes()
+    elif option == 3:
+        bilheteira_por_ano()
+    elif option == 4:
+        bilheteira_por_espetaculo()
+    elif option == 5:
+        bilheteira_por_sessao()
+               
 def menuUser():
     while True:
         print("\n1. Reservar bilhetes\n2. Alterar Reserva\n3. Cancelar Reserva\n4. Alterar password")
         option = input("Opção: ")
         if int(option) == 1:
-            reservar_bilhetes()
+            reservar_bilhetes(None, None)
         elif int(option) == 2:
             alterar_reserva()
         elif int(option) == 3:
             cancelar_reserva()
-
+        elif int(option) == 4:
+            alterar_password()
 
 def login():
     global currentuser
@@ -127,7 +137,7 @@ def listar_espetaculos():
 def listar_datas_espetaculo(nome):
     print(f"\n------ Datas do espetáculo {nome} ----")
     print("\n\t--------------")
-    for date in cur.execute(f"SELECT data FROM Datas WHERE espetaculo='{nome}'"):
+    for date in cur.execute(f"SELECT data FROM Datas_espetaculo WHERE espetaculo='{nome}'"):
         print(f"\t| {date[0]} |")
     print("\t--------------")
 
@@ -248,69 +258,20 @@ def escolha_quantidade(lugares_possiveis):
 
 def inserir_novas_reservas(novareserva, data_espetaculo):
     ultima_reserva = cur.execute(f"INSERT INTO Reservas DEFAULT VALUES ").lastrowid
-
-
     for lugar in novareserva:
         cur.execute(
             f"INSERT INTO User_espetaculo_lugar(user, data_espetaculo, lugar, reserva) VALUES('{currentuser}', '{data_espetaculo}', '{lugar}', '{ultima_reserva}')")
-
     print("\n----------Lugares reservados com sucesso----------")
 
 
-def reservar_bilhetes():
-    # cur.execute(
-    #    f"SELECT reservas FROM User_Espetaculos_Reservas WHERE data='{DateTime(data)}' AND espetaculo='{espetaculo}'")
-    # result = cur.fetchall()
-    # result_merged = [""]
-    # for i in range(0, len(result)):
-    #    result_merged[0] += (result[i][0])
-    # lugares = []
-    # if len(result) > 0:
-    #    lugaresreservados = result_merged[0].split(" ")
-    #    lugares = result_merged[0].split(" ")
-    #    controller.convert_letters_in_numbers(lugaresreservados, letras)
-    ##else:
-    #    global sala
-    #    sala = sala_backup
-    # if not controller.check_if_is_full():
-    #     mostrar_sala()
-    #    isnum = False
-    #   while not isnum:
-    #      quantidade = input("\nQuantos lugares pretende reservar? ")
-    #      if quantidade.isnumeric():
-    #          if int(quantidade) > 0:
-    #              quantidade = int(quantidade)
-    #              isnum = True
-    #          else:
-    #              print("\033[91mTem de inserir um número maior que 0.\033[0m")
-    #      else:
-    #          print("\033[91mTem de inserir um número válido.\033[0m")
+def reservar_bilhetes(espetaculo, data_espetaculo):
+    if espetaculo is None:
+        espetaculo = listar_espetaculos()
+        data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo)
 
-    #  manual_or_auto = input("Pretende a escolha manual ou automática? (Manual/Auto):")
-    #  if manual_or_auto == "Manual":
-    #      novareserva = escolha_manual(quantidade, lugares)
-    #  elif manual_or_auto == "Auto":
-    #      novareserva = escolha_auto(quantidade)
-
-    # tosql = ""
-    # for item in novareserva:
-    #     if tosql == "":
-    #         tosql += item
-    #     else:
-    #         tosql += " " + item
-    # cur.execute(
-    #     f"INSERT INTO User_Espetaculos_Reservas(username, espetaculo, data, reservas) VALUES('{currentuser}', '{espetaculo}', '{DateTime(data)}', '{tosql} ')")
-    # print("\n----------Lugares reservados com sucesso----------")
-    # menuUser()
-    # else:
-    #    print("\n\033[91mPedimos desculpa, mas a sala encontra-se esgotada.\033[0m")
-
-    espetaculo = listar_espetaculos()
-    data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo)
     lugares = lugares_sala()
     lugares_reservados = lugares_sala_reservados(data_espetaculo)
     lugares_disponiveis = [x for x in lugares if x not in lugares_reservados]
-
     if lugares_disponiveis:
         controller.convert_letters_in_numbers(lugares_reservados, letras)
     else:
@@ -322,47 +283,26 @@ def reservar_bilhetes():
         manual_or_auto = input("Pretende a escolha manual ou automática? (Manual/Auto):")
         if manual_or_auto == "Manual":
             novareserva = escolha_manual(quantidade, lugares, lugares_disponiveis)
+            print(novareserva)
         elif manual_or_auto == "Auto":
-            novareserva = escolha_auto(quantidade, lugares_disponiveis)
+            novareserva = escolha_auto(quantidade)
 
         inserir_novas_reservas(novareserva, data_espetaculo)
     else:
-        print("\n\033[91mPedimos desculpa, mas a sala encontra-se esgotada.\033[0m")
+        print("\n\033[91mPedimos de sculpa, mas a sala encontra-se esgotada.\033[0m")
 
 
 def escolha_manual(quantidade, lugares, lugares_disponiveis):
     novareserva = []
     for i in range(0, quantidade):
-        while True:
-            lugar = input("Escolha o lugar: ").upper()
-            if lugar not in lugares:
-                print("\n\033[91mALERTA: Esse lugar não existe.\n\033[0m")
+        lugar = input("Escolha o lugar: ").upper()
+        if lugar not in lugares:
+            print("\n\033[91mALERTA: Esse lugar não existe.\n\033[0m")
+        else:
+            if lugar not in lugares_disponiveis or lugar in novareserva:
+                print("\n\033[91mALERTA: Esse lugar já está escolhido.\n\033[0m")
             else:
-                if lugar not in lugares_disponiveis or lugar in novareserva:
-                    print("\n\033[91mALERTA: Esse lugar já está escolhido.\n\033[0m")
-                else:
-                    novareserva.append(lugar)
-                    break;
-    return novareserva
-        #count_to_approve = 0
-        #while count_to_approve < 3:
-        #    lugar = input("Escolha o lugar: ")
-        #    if controller.check_letra(lugar):
-        #        if lugar in lugares or lugar in novareserva:
-        #            print("\n\033[91mALERTA: Esse lugar já está escolhido.\n\033[0m")
-        #        else:
-        #            count_to_approve += 1
-        #        if ((lugar[0] == "A" or lugar[0] == "F") and ((int(lugar[1:3]) > 2 and int(lugar[1:3]) < 6) or (
-        #                int(lugar[1:3]) > 9 and int(lugar[1:3]) < 13))):
-        #            print("\n\033[91mALERTA: Esse lugar não existe.\n\033[0m")
-        #        else:
-        #            count_to_approve += 1
-        #        novareserva.append(lugar)
-        #        count_to_approve += 1
-        #    else:
-        #        print("\n\033[91mO lugar que inseriu não está correto.\n\033[0m")
-
-
+                novareserva.append(lugar)
     return novareserva
 
 
@@ -445,8 +385,6 @@ def look_for_odd(quantidade):
                         for n in range(j, j + quantidade):
                             novareserva.append(f"{letras[i]}{n + 1}")
                         return novareserva
-
-    print(novareserva)
     for i in range(0, 11):
         for j in range(2, 12):
             if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
@@ -532,36 +470,36 @@ def data_espetaculo_de_reserva(reserva):
     return cur.execute(
         f"SELECT data_espetaculo FROM User_espetaculo_lugar WHERE reserva='{reserva}'").fetchone()[0]
 
-
-
-def alterar_reserva():
-    espetaculo = listar_espetaculos_user()
-    if espetaculo is not None:
-        reserva = listar_reservas_utilizador(espetaculo)
-        lugares = lugares_sala()
-        data_espetaculo = data_espetaculo_de_reserva(reserva)
-        apagar_reserva(reserva)
-        lugares_reservados = lugares_sala_reservados(data_espetaculo)
-        lugares_disponiveis = [x for x in lugares if x not in lugares_reservados]
-        quantidade = escolha_quantidade(len(lugares_disponiveis))
-        novareserva = escolha_manual(quantidade, lugares, lugares_disponiveis)
-        inserir_novas_reservas(novareserva, data_espetaculo)
-
-
 def apagar_reserva(reserva):
     cur.execute(
         f" DELETE FROM User_espetaculo_lugar WHERE reserva = '{reserva}'")
     cur.execute(
         f" DELETE FROM Reservas WHERE id = '{reserva}'")
 
+def alterar_reserva():
+    espetaculo = listar_espetaculos_user()
+    if espetaculo is not None:
+        reserva = listar_reservas_utilizador(espetaculo)
+        cur.execute(f"SELECT data_espetaculo FROM User_espetaculo_lugar WHERE reserva ='{reserva}'")
+        data_espetaculo = cur.fetchone()[0]
+        apagar_reserva(reserva)
+        reservar_bilhetes(espetaculo, data_espetaculo)
+        # lugares = lugares_sala()
+        # data_espetaculo = data_espetaculo_de_reserva(reserva)
+
+        # lugares_reservados = lugares_sala_reservados(data_espetaculo)
+        # lugares_disponiveis = [x for x in lugares if x not in lugares_reservados]
+        # quantidade = escolha_quantidade(len(lugares_disponiveis))
+        # novareserva = escolha_manual(quantidade, lugares, lugares_disponiveis)
+        # inserir_novas_reservas(novareserva, data_espetaculo)
+
 
 def cancelar_reserva():
     espetaculo = listar_espetaculos_user()
     if espetaculo is not None:
         reserva = listar_reservas_utilizador(espetaculo)
-        apagar_reserva(reserva)
-
-
+        model.apagar_reserva(reserva)
+        menuUser()
 
 def listar_espetaculos_user():
     i = 0
@@ -612,3 +550,90 @@ def mapa_datas_lugares(espetaculo):
             temp[1] = temp[1] + " " + item[1]
             map[item[2]] = temp
     return map
+
+def pedir_ano():
+    while True:
+        ano = input("Por favor, insira o ano: ")
+        try:
+            ano = int(ano)
+            if ano == 2022 or ano == 2023:
+                return ano
+        except:
+            print("\033[91m Por favor insira o ano em formato numérico.\033[0m")
+        
+def pedir_mes():
+    while True:
+        mes = input("Por favor, insira o mês(0-12): ")
+        try:
+            mes = int(mes)
+            if mes >0 and mes < 13:
+                return mes
+        except:
+            print("\033[91m Por favor insira um mês válido.\033[0m")
+
+def pedir_dia():
+    while True:
+        dia = input("Por favor, insira o dia(0-31): ")
+        try:
+            dia = int(dia)
+            if dia >0 and dia < 32:
+                return dia
+        except:
+            print("\033[91m Por favor insira um dia válido.\033[0m")
+
+def bilheteira_por_dia():
+    ano = pedir_ano()
+    mes = pedir_mes()
+    dia = pedir_dia()
+    datas = []
+    for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}' AND strftime('%m', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{mes.zfill(2)}' AND strftime('%d', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{dia.zfill(2)}'"):
+        datas.append(item[0])
+    total = controller.get_total_bilheteira(datas)
+    print(f"Total no dia {dia}/{mes}/{ano}: {total}€")   
+    menuBilheteira()
+
+
+def bilheteira_por_mes():
+    ano = pedir_ano()
+    mes = pedir_mes()
+    datas = []
+    for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}' AND strftime('%m', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{mes.zfill(2)}'"):
+        datas.append(item[0])
+    total = controller.get_total_bilheteira(datas)
+    print(f"Total no mês {mes}/{ano}: {total}€")   
+    menuBilheteira()
+
+def bilheteira_por_ano():
+    ano = pedir_ano()
+    datas = []
+    total = 0
+    for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}'"):
+        datas.append(item[0])
+    total = controller.get_total_bilheteira(datas)
+    print(f"Total no ano {ano}: {total}€")    
+    menuBilheteira()
+    
+
+def bilheteira_por_espetaculo():
+    espetaculo = listar_espetaculos()
+    datas = []
+    total = 0
+    for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE espetaculo='{espetaculo}'"):
+        datas.append(item[0])
+        
+    total = controller.get_total_bilheteira(datas)
+    print(f"Total do espetaculo '{espetaculo}': {total}€")
+    menuBilheteira()
+
+def bilheteira_por_sessao():
+    espetaculo = listar_espetaculos()
+    data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo)
+    lugares_reservados = lugares_sala_reservados(data_espetaculo)
+    total = 0
+    for item in lugares_reservados:
+        if item == "F6" or item == "F7" or item == "F8" or item == "F8" or item == "A6" or item == "A7" or item == "A8" or item == "A9":
+            total += 12
+        else: 
+            total += 4
+    print(f"Total da sessão: {total}€")
+    menuBilheteira()
