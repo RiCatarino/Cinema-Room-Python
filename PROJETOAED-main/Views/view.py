@@ -167,7 +167,7 @@ def inserir_nova_data(nome_espetaculo):
     mes = pedir_mes()
     dia = pedir_dia()
     
-    novadata = f"{dia}/{mes}/{ano}"
+    novadata = f"{str(dia).zfill(2)}/{str(mes).zfill(2)}/{str(ano).zfill(2)}"
     if controller.inserir_nova_data(nome_espetaculo, novadata):
         print("\n---------- Sessão adicionada com sucesso. ----------")
         menuAdmin()
@@ -351,7 +351,7 @@ def look_for_even(quantidade):
             if len(novareserva) == quantidade:
                 return novareserva
         for i in range(0, 11):
-            for j in range(2, 12):
+            for j in range(2, 11):
                 if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
                     if f"{letras[i]}{j + 1}" in novareserva:
                         pass
@@ -366,18 +366,18 @@ def look_for_even(quantidade):
                     novareserva.append(f"{letras[i]}{j + 1}")
                 if len(novareserva) == quantidade:
                     return novareserva
-    else:
-        for i in range(0, 11):
-            novareserva.clear()
-            for j in range(2, 12):
-                if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
-                    if f"{letras[i]}{j + 1}" in novareserva:
-                        pass
-                    else:
-                        novareserva.append(f"{letras[i]}{j + 1}")
-                        novareserva.append(f"{letras[i]}{j + 2}")
-                if len(novareserva) == quantidade:
-                    return novareserva        
+    elif quantidade >= 10:
+        while quantidade - len(novareserva) >=10:
+            for i in range(0, 11):
+                for j in range(2, 11):
+                    if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
+                        if f"{letras[i]}{j + 1}" in novareserva:
+                            pass
+                        else:
+                            novareserva.append(f"{letras[i]}{j + 1}")
+                            novareserva.append(f"{letras[i]}{j + 2}")
+                        if len(novareserva) == quantidade:
+                            return novareserva
         for i in range(0, 11):
             if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
                 novareserva.append(f"{letras[i]}{1}")
@@ -386,8 +386,37 @@ def look_for_even(quantidade):
                 return novareserva
         for i in range(0, 11):
             if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+                novareserva.append(f"{letras[i]}{12}")
                 novareserva.append(f"{letras[i]}{13}")
-                novareserva.append(f"{letras[i]}{14}")
+            if len(novareserva) == quantidade:
+                return novareserva
+        for i in range(0, 11):
+            for j in range(0, 13):
+                if sala[i][j] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{j + 1}")
+                if len(novareserva) == quantidade:
+                    return novareserva
+    else:
+        for i in range(0, 11):
+                for j in range(2, 11):
+                    if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
+                        if f"{letras[i]}{j + 1}" in novareserva:
+                            pass
+                        else:
+                            novareserva.append(f"{letras[i]}{j + 1}")
+                            novareserva.append(f"{letras[i]}{j + 2}")
+                        if len(novareserva) == quantidade:
+                            return novareserva
+        for i in range(0, 11):
+            if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
+                novareserva.append(f"{letras[i]}{1}")
+                novareserva.append(f"{letras[i]}{2}")
+            if len(novareserva) == quantidade:
+                return novareserva
+        for i in range(0, 11):
+            if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+                novareserva.append(f"{letras[i]}{12}")
+                novareserva.append(f"{letras[i]}{13}")
             if len(novareserva) == quantidade:
                 return novareserva
         for i in range(0, 11):
@@ -399,99 +428,44 @@ def look_for_even(quantidade):
 
 def look_for_odd(quantidade):
     novareserva = []
-    count = 0
-
-    countall = 0
     for i in range(0, 11):
-        for j in range(2, 12):
-            if j + quantidade < 12:
-                countall = 0
-                for k in range(j, j + quantidade):
-                    if (sala[i][j] == " ▢ " or sala[i][j] == "VIP"):
-                        countall += 1
-                    if countall == quantidade:
-                        for n in range(j, j + quantidade):
-                            novareserva.append(f"{letras[i]}{n + 1}")
+        for j in range(2, 11):
+            if quantidade - len(novareserva)  > 1:
+                if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
+                    print(novareserva)
+                    if f"{letras[i]}{j + 1}" in novareserva:
+                        pass
+                    else:
+                        novareserva.append(f"{letras[i]}{j + 1}")
+                        novareserva.append(f"{letras[i]}{j + 2}")
+                    if len(novareserva) == quantidade:
                         return novareserva
-    for i in range(0, 11):
-        for j in range(2, 12):
-            if (sala[i][j] == " ▢ " and sala[i][j + 1] == " ▢ ") or (sala[i][j] == "VIP" and sala[i][j + 1] == "VIP"):
-                if f"{letras[i]}{j + 1}" in novareserva:
-                    pass
-                else:
-                    novareserva.append(f"{letras[i]}{j + 1}")
-                    novareserva.append(f"{letras[i]}{j + 2}")
-                    count += 2
-            if count == quantidade:
-                return novareserva
-    print("center:", novareserva)
-
-    if (quantidade - count) % 2 != 0 and (quantidade - count) > 1:
-        for i in range(0, 11):
-            if (quantidade - count) > 1:  # SE AINDA SOBRAR MAIS QUE UMA PESSOA
+            else:
+                if sala[i][j] == " ▢ " or sala[i][j] == "VIP":
+                    if f"{letras[i]}{j}" in novareserva:
+                        pass
+                    else:
+                        novareserva.append(f"{letras[i]}{j + 1}")
+                        return novareserva 
+        if quantidade - len(novareserva) > 1:         
+            for i in range(0, 11):
                 if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
                     novareserva.append(f"{letras[i]}{1}")
                     novareserva.append(f"{letras[i]}{2}")
-                    count += 2
-                if count == quantidade:
+                if len(novareserva) == quantidade:
                     return novareserva
-            else:
-                if sala[i][0] == " ▢ ":
-                    novareserva.append(f"{letras[i]}{1}")
-                    return novareserva
-                elif sala[i][0] == " ▢ ":
-                    novareserva.append(f"{letras[i]}{2}")
-                    return novareserva
-        print("left:", novareserva)
-
-        for i in range(0, 11):
-            if (quantidade - count) > 1:  # SE AINDA SOBRAR MAIS QUE UMA PESSOA
+            for i in range(0, 11):
                 if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
+                    novareserva.append(f"{letras[i]}{12}")
                     novareserva.append(f"{letras[i]}{13}")
-                    novareserva.append(f"{letras[i]}{14}")
-                    count += 2
-                if count == quantidade:
+                if len(novareserva) == quantidade:
                     return novareserva
-            else:
-                if sala[i][0] == " ▢ ":
-                    novareserva.append(f"{letras[i]}{1}")
-                    return novareserva
-                elif sala[i][0] == " ▢ ":
-                    novareserva.append(f"{letras[i]}{2}")
-                    return novareserva
-        print("right:", novareserva)
-
         for i in range(0, 11):
             for j in range(0, 13):
                 if sala[i][j] == " ▢ ":
                     novareserva.append(f"{letras[i]}{j + 1}")
-                    count += 1
-                if count == quantidade:
+                if len(novareserva) == quantidade:
                     return novareserva
-    else:
-        for i in range(0, 11):
-            if sala[i][0] == " ▢ " and sala[i][1] == " ▢ ":
-                novareserva.append(f"{letras[i]}{1}")
-                novareserva.append(f"{letras[i]}{2}")
-                count += 2
-            if count == quantidade:
-                return novareserva
-
-        for i in range(0, 11):
-            if sala[i][12] == " ▢ " and sala[i][13] == " ▢ ":
-                novareserva.append(f"{letras[i]}{13}")
-                novareserva.append(f"{letras[i]}{14}")
-                count += 2
-            if count == quantidade:
-                return novareserva
-        for i in range(0, 11):
-            for j in range(0, 13):
-                if sala[i][j] == " ▢ ":
-                    novareserva.append(f"{letras[i]}{j + 1}")
-                    count += 1
-                if count == quantidade:
-                    return novareserva
-    print(novareserva)
 
 
 def data_espetaculo_de_reserva(reserva):
