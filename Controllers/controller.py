@@ -69,3 +69,13 @@ def get_total_bilheteira(datas):
         else: 
             total += 4        
     return total
+
+def get_total_reserva(novareserva):
+    total = 0
+    for item in novareserva:
+        if item == "F6" or item == "F7" or item == "F8" or item == "F8" or item == "A6" or item == "A7" or item == "A8" or item == "A9":
+            total += 12
+        else: 
+            total += 4     
+    return total
+  
