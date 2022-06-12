@@ -21,4 +21,8 @@ INNER JOIN Lugares l ON uel.lugar = l.id
 WHERE uel.user='q' AND espetaculo='Filme2' 
 ORDER BY l.fila, l.coluna
 
-SELECT data_espetaculo.data WHERE reserva ='{reserva}' AND  
+SELECT data_espetaculo.data WHERE reserva ='{reserva}' AND 
+
+SELECT * FROM User_espetaculo_lugar WHERE data_espetaculo = 8
+
+DELETE FROM User_espetaculo_lugar
