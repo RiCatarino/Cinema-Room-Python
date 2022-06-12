@@ -1,26 +1,30 @@
 import sqlite3
-<<<<<<< HEAD
-=======
 import os
->>>>>>> 7fc5202 (Final)
 from Models import model as mod
 from Controllers import controller as cont
 
 con = sqlite3.connect('projeto.db', isolation_level=None)
 cur = con.cursor()
-has_txn_open = False
 
-<<<<<<< HEAD
-currentuser = ""
-=======
 currentuser= ""
 
 letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
 letras.reverse()
 
 sala = []
->>>>>>> 7fc5202 (Final)
 
+sala_backup = [[" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", "   ", "   ", "   ", "VIP", "VIP", "VIP", "VIP", "   ", "   ", "   ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
+               [" ▢ ", " ▢ ", "   ", "   ", "   ", "VIP", "VIP", "VIP", "VIP", "   ", "   ", "   ", " ▢ ", " ▢ "],
+               ]
 
 
 def main():
@@ -48,27 +52,13 @@ def menuAdmin():
     option = int(input("\n\033[1mOpção: \033[0m"))
     if option == 1:
         cont.inserir_espetaculo()
-<<<<<<< HEAD
-    elif option == 2:
-        cont.inserir_nova_data(None)
-    elif option == 3:
-        cont.ver_sala()
-=======
     elif option ==2:
         cont.remover_espetaculo()
     elif option == 3:
         cont.remover_sessao()
->>>>>>> 7fc5202 (Final)
     elif option == 4:
         cont.inserir_nova_data(None)
     elif option == 5:
-<<<<<<< HEAD
-        cont.alterar_password_by_utilizador(False, None)
-    elif option == 6:
-        cont.alterar_password()
-    elif option == 7:
-        cont.signup("admin")
-=======
         cont.ver_sala()
         askforenter()
         cont.ver_sala()
@@ -76,7 +66,6 @@ def menuAdmin():
         menuBilheteira()
     elif option == 7:
         cont.alterar_password_by_utilizador(False, None)
->>>>>>> 7fc5202 (Final)
     elif option == 8:
         cont.alterar_password()
     elif option == 9:
@@ -91,30 +80,6 @@ def menuBilheteira():
     print("\033[95m\033[1m\n-------- Menu Bilheteira --------\033[0m")
     print_line()
     print(
-<<<<<<< HEAD
-        "\n1. Valor por dia \n2. Valor por mês\n3. Valor por ano \n4. Valor por espetáculo \n5. Valor por sessão\n")
-    option = int(input("\nOpção:"))
-    if option == 1:
-        cont.bilheteira_por_dia()
-    elif option == 2:
-        cont.bilheteira_por_mes()
-    elif option == 3:
-        cont.bilheteira_por_ano()
-    elif option == 4:
-        cont.bilheteira_por_espetaculo()
-    elif option == 5:
-        cont.bilheteira_por_sessao()
-
-
-def menuUser():
-    global has_txn_open
-    while True:
-        if has_txn_open:
-            con.rollback()
-            has_txn_open = False
-        print("\n1. Reservar bilhetes\n2. Alterar Reserva\n3. Cancelar Reserva\n4. Alterar password\n5. Sair")
-        option = input("\nOpção: ")
-=======
         "\n\033[92m\033[1m1. Valor por dia \n2. Valor por mês\n3. Valor por ano \n4. Valor por espetáculo \n5. Valor por sessão\n\033[0m")
     print_line()
     while True:
@@ -202,24 +167,11 @@ def pedir_repeat_nova_password():
 def pedir_ano():
     while True:
         ano = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o ano: \033[0m")
->>>>>>> 7fc5202 (Final)
         try:
-            if int(option) == 1:
-                cont.reservar_bilhetes(None, None)
-            elif int(option) == 2:
-                cont.alterar_reserva()
-            elif int(option) == 3:
-                cont.cancelar_reserva()
-            elif int(option) == 4:
-                cont.alterar_password()
-            elif int(option) == 5:
-                menu_inicial()
-            else:
-                print("Opção não existe.")
+            ano = int(ano)
+            if ano == 2022 or ano == 2023:
+                return ano
         except:
-<<<<<<< HEAD
-            print("Opção não existe.")
-=======
             print("\033[91m Por favor insira o ano em formato numérico.\033[0m")
 
 def pedir_mes():
@@ -382,4 +334,3 @@ def print_total_bilheteira_sessao(data, espetaculo, total):
 
 def print_sucesso_remocao_sessao(data, espetaculo):
     print(f"\033[34m\033[1m\nA sessão na data {data} do espetáculo '{espetaculo}' foi removida com sucesso.\033[0m")
->>>>>>> 7fc5202 (Final)
