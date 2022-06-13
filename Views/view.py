@@ -1,17 +1,20 @@
-import sqlite3
+import sqlite3 #Biblioteca sqlite
 import os
+import sys
+
+from py import process #Biblioteca com o intuito de detetar o SO para limpar o terminal
 from Models import model as mod
 from Controllers import controller as cont
 
-con = sqlite3.connect('projeto.db', isolation_level=None)
+con = sqlite3.connect('projeto.db', isolation_level=None) #Conexão à BD
 cur = con.cursor()
 
-currentuser= ""
+currentuser= "" #Variável para saber qual é o utilizador que está ativo
 
-letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
-letras.reverse()
+letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"] # Lista de letras para inserir no printa da sala, e receber os inputs dos utilizadores relativamente aos bilhetes
+letras.reverse() #Inverte a lista, pois é o formato da sala
 
-sala = []
+sala = [] # Variável do tipo lista para receber a sala_backup e alterar consoante as reservas
 
 sala_backup = [[" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
                [" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ "],
@@ -30,62 +33,71 @@ sala_backup = [[" ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", " ▢ ", "
 def main():
     menu_inicial()
 
-
 def menu_inicial():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear') # Limpa o terminal consoante o SO
     print("\n\033[95m\033[1m-------BEM-VINDO AO COOLISEU-----\033[0m")
-    print("\033[92m\033[1m1. Iniciar Sessão\n2. Registar Utilizador\033[95m")
+    print("\033[92m\033[1m1. Iniciar Sessão\n2. Registar Utilizador\n3. Sair\033[95m")
     print_line()
-    option = input("\n\033[0m\033[1mOpção ( Número ): \033[0m")
-    if int(option) == 1:
-        cont.login()
-    elif int(option) == 2:
-        cont.signup("User")
-        menu_inicial()
-
+    while True:
+        try: # Tenta converter o input em int, se encontrar uma excepção(linha 48), dá print com o erro.
+            option = int(input("\n\033[0m\033[1mOpção ( Número ): \033[0m")) #Pede input ao utilizador e tenta converter em int
+            if option== 1:
+                cont.login()
+            elif option == 2:
+                cont.signup("User")
+                menu_inicial()
+            elif option == 3:
+                break
+            else:
+                print_erro_input()# Se não for o 1 ou 2
+        except:
+            print_erro_input() # Se o input não for um número
 
 def menuAdmin():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print(f"\n\033[95m\033[1m---------- Olá administrador {currentuser} ----------\033[0m")
-    print(
-        "\n\033[92m\033[1m1. Inserir Espetáculo\n2. Remover Espetáculo \n3. Remover sessão \n4. Inserir nova data do espetáculo\n5. Ver sala por sessão \n6. Bilheteira  \n7. Alterar password de um cliente\n8. Alterar password\n9. Registar novo administrador\n10. Sair\033[0m")
-    option = int(input("\n\033[1mOpção: \033[0m"))
-    if option == 1:
-        cont.inserir_espetaculo()
-    elif option ==2:
-        cont.remover_espetaculo()
-    elif option == 3:
-        cont.remover_sessao()
-    elif option == 4:
-        cont.inserir_nova_data(None)
-    elif option == 5:
-        cont.ver_sala()
-        askforenter()
-        cont.ver_sala()
-    elif option == 6:
-        menuBilheteira()
-    elif option == 7:
-        cont.alterar_password_by_utilizador(False, None)
-    elif option == 8:
-        cont.alterar_password()
-    elif option == 9:
-        cont.signup("admin")
-        menuAdmin()
-    elif option == 10:
-        menu_inicial()
+    os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
+    print(f"\n\033[95m\033[1m---------- Olá administrador {currentuser} ----------\033[0m") #Print com o nome do utilizador
+    print("\n\033[92m\033[1m1. Inserir Espetáculo\n2. Remover Espetáculo \n3. Remover sessão \n4. Inserir nova data do espetáculo\n5. Ver sala por sessão \n6. Bilheteira  \n7. Alterar password de um cliente\n8. Alterar password\n9. Registar novo administrador\n10. Sair\033[0m")
+    while True:
+        try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
+            option = int(input("\n\033[1mOpção: \033[0m"))#Pede input ao utilizador e tenta converter em int
+            if option == 1:
+                cont.inserir_espetaculo()
+            elif option ==2:
+                cont.remover_espetaculo()
+            elif option == 3:
+                cont.remover_sessao()
+            elif option == 4:
+                cont.inserir_nova_data(None)
+            elif option == 5:
+                cont.ver_sala()
+                askforenter()
+            elif option == 6:
+                menuBilheteira()
+            elif option == 7:
+                cont.alterar_password_by_utilizador(None)
+            elif option == 8:
+                cont.alterar_password()
+            elif option == 9:
+                cont.signup("admin")
+                menuAdmin()
+            elif option == 10:
+                menu_inicial()
+            else:
+                print_erro_input() # Se não for um dos números do menu
+        except:
+            print_erro_input() # Se o input não for um número
 
 
 def menuBilheteira():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
     print("\033[95m\033[1m\n-------- Menu Bilheteira --------\033[0m")
     print_line()
     print(
         "\n\033[92m\033[1m1. Valor por dia \n2. Valor por mês\n3. Valor por ano \n4. Valor por espetáculo \n5. Valor por sessão\n\033[0m")
     print_line()
     while True:
-        option = input("\n\033[1mOpção:\033[0m")
-        try:
-            option = int(option)
+        try: # Tenta converter o input em int, se encontrar uma excepção(linha 108), dá print com o erro.
+            option = int(cont.handle_inp("\n\033[1mOpção: \033[0m"))#Pede input ao utilizador e tenta converter em int, caso insira exit, será encaminhado para o menu admin
             if option == 1:
                 cont.bilheteira_por_dia()
             elif option == 2:
@@ -97,45 +109,48 @@ def menuBilheteira():
             elif option == 5:
                 cont.bilheteira_por_sessao()
             else:
-                print("\033[91m\033[1mTem de inserir uma opção válida.\033[0m")
+                print_erro_input()# Se não for um dos números do menu
         except:
-            if str(option).upper() == "EXIT":
-                menuAdmin()
-            else:
-                print("\033[91m\033[1mTem de inserir uma opção válida.\033[0m")
+            print_erro_input()# Se o input não for um número
+                
+
 def menuUser():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
     print(f"\n\033[95m\033[1m---------- Olá {currentuser}, Bem-vindo ao COOLISEU ----------\033[0m")
     while True:
         print("\n\033[92m\033[1m1. Reservar bilhetes\n2. Alterar Reserva\n3. Cancelar Reserva\n4. Alterar password\n5. Sair\033[0m")
         print_line()
-        option = input("\n\033[1mOpção: \033[0m")
-        if int(option) == 1:
-            cont.reservar_bilhetes(None, None)
-        elif int(option) == 2:
-            cont.alterar_reserva()
-        elif int(option) == 3:
-            cont.cancelar_reserva()
-        elif int(option) == 4:
-            cont.alterar_password()
-        elif int(option) == 5:
-            menu_inicial()
-        else:
-            print("Opção não existe.")
+        while True:
+            try:
+                option = int(input("\n\033[1mOpção: \033[0m"))
+                if option == 1:
+                    cont.reservar_bilhetes(None, None)
+                elif option == 2:
+                    cont.alterar_reserva()
+                elif option == 3:
+                    cont.cancelar_reserva()
+                elif option == 4:
+                    cont.alterar_password()
+                elif option == 5:
+                    menu_inicial()
+                else:
+                    print_erro_input()# Se não for um dos números do menu
+            except:
+                print_erro_input()# Se o input não for um número
+
             
 ## SALA
 def mostrar_sala():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
     print("\n\t\t\t\033[95m   ESTADO DA SALA")
     print("\033[94m|---------------------------------------------------------------------|")
     print("|     1   2      3   4   5   6   7   8   9   10  11  12     13  14    |")
-    for i in range(0, 11):
-        for k in range(1):
-            if i == 6 or i == 10:
+    for i in range(0, 11): #Para cada linha inteira preenche o que está no respetivo indíce, seja um lugar vazio ou reservado
+            if i == 6 or i == 10: #se for a 6 linha da matriz, salta uma linha (conforme o design da sala que está no enunciado)
                 print()
-            print("|", letras[i], "\033[0m", sala[i][k], sala[i][k + 1], "  ", sala[i][k + 2], sala[i][k + 3],
-                  sala[i][k + 4], sala[i][k + 5], sala[i][k + 6], sala[i][k + 7], sala[i][k + 8], sala[i][k + 9],
-                  sala[i][k + 10], sala[i][k + 11], "  ", sala[i][k + 12], sala[i][k + 13], "\033[94m", letras[i], "|")
+            print("|", letras[i], "\033[0m", sala[i][0], sala[i][1], "  ", sala[i][2], sala[i][3],
+                  sala[i][4], sala[i][5], sala[i][6], sala[i][7], sala[i][8], sala[i][9],
+                  sala[i][10], sala[i][11], "  ", sala[i][12], sala[i][13], "\033[94m", letras[i], "|") #Print dos indíces com as diferentes cores em cada parte, e também as barras de lado
     print("\n\t   |----------------------------------------------------------|")
     print("\t   |\t\t\t\t\t\t\t      |")
     print("\t   |\t\t\t PALCO \t\t\t\t      |")
@@ -145,8 +160,7 @@ def mostrar_sala():
 ##INPUT REQUESTS
 
 def askforenter():
-    return input("\n\033[34m\033[1mPara continuar prima 'Enter'...\033[0m")
-
+    return input("\n\033[34m\033[1mPara continuar prima 'Enter'...\033[0m") # Pede ao utilizador qualquer input para continuar o programa
 
 #USERS E PASSWORDS
 def pedir_username():
@@ -166,20 +180,20 @@ def pedir_repeat_nova_password():
 
 def pedir_ano():
     while True:
-        ano = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o ano: \033[0m")
-        try:
-            ano = int(ano)
-            if ano == 2022 or ano == 2023:
+        ano = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o ano: \033[0m") #Pede o input ao utilizador do ano
+        try: #tenta converter em INT
+            ano = int(ano) #converte o input em int
+            if ano == 2022 or ano == 2023: #se o input for 2022 ou 2023, devolve o input à respetiva função
                 return ano
         except:
-            print("\033[91m Por favor insira o ano em formato numérico.\033[0m")
+            print("\033[91m Por favor insira o ano em formato numérico.\033[0m") #
 
 def pedir_mes():
     while True:
         mes = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o mês(0-12): \033[0m")
-        try:
-            mes = int(mes)
-            if mes > 0 and mes < 13:
+        try: #tenta converter o input em int
+            mes = int(mes)#converte o input em int
+            if mes > 0 and mes < 13:#Se o input for entre 1 e 12 devolve o input em tipo string
                 return str(mes)
         except:
             print("\033[91m Por favor insira um mês válido.\033[0m")
@@ -187,9 +201,9 @@ def pedir_mes():
 def pedir_dia():
     while True:
         dia = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o dia(0-31): \033[0m")
-        try:
-            dia = int(dia)
-            if dia > 0 and dia < 32:
+        try:#tenta converter o input em int
+            dia = int(dia) #converte o input em int
+            if dia > 0 and dia < 32:#Se o input for entre 0 e 31 devolve o input em tipo string
                 return str(dia)
         except:
             print("\033[91m Por favor insira um dia válido.\033[0m")
@@ -260,6 +274,10 @@ def print_cabecalho_lista_espetaculos():
 def print_lista_espetaculos(i, espetaculo):
     print(f"\033[92m\033[1m{i}: {espetaculo[0]} \033[0m")
 
+def print_lista_espetaculos_com_id(espetaculo):
+    print(f"\nID: {espetaculo[0]} Nome: {espetaculo[1]} ")
+
+
 def print_line():
     print("\033[95m\033[1m---------------------------------\033[0m")
     
@@ -281,6 +299,9 @@ def print_sucesso_remocao(espetaculo):
 def print_sessoa_adicionada_sucesso():
     print("\n\033[95m\033[1m---------- Sessão adicionada com sucesso. ----------\033[0m")
 
+def print_erro_input():
+        print("\033[91m\033[1mEssa opção não existe.\033[0m") # Se o input não for um número
+    
 ##RESERVAS
 def print_sem_lugares_disponiveis():
     print("\033[91mNão existem lugares suficientes disponíveis.\033[0m")
@@ -315,6 +336,8 @@ def print_cabecalho_lista_reservas():
 def print_lista_reservas(i, mapa_reservas, reserva):
     print(f"{i}: Data- {mapa_reservas.get(reserva)[0]} Bilhetes- {mapa_reservas.get(reserva)[1]}")
 
+def print_reserva_cancelada():
+    print(f"\n\033[33m\033[1mReserva cancelada!\033[0m")
 ## BILHETEIRA
 
 def print_total_bilheteira_dia(dia, mes, ano, total):

@@ -1,6 +1,5 @@
 import sqlite3
 from xmlrpc.client import DateTime
-from Views import view 
 con = sqlite3.connect('projeto.db', isolation_level=None)
 cur = con.cursor()
 
@@ -18,3 +17,5 @@ def inserir_nova_data(name, date):
 def change_password(username, password):
     cur.execute(f"UPDATE Users SET password='{password}' WHERE username='{username}'")
     
+def apagar_reserva(reserva):
+    cur.execute(f"DELETE FROM User_espetaculo_lugar WHERE reserva='{reserva}'")
