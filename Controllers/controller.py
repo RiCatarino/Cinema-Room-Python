@@ -5,10 +5,10 @@ from django.views import View
 from Models import model as mod
 from Views import view
 
-con = sqlite3.connect('projeto.db', isolation_level=None)
+con = sqlite3.connect('projeto.db')
 cur = con.cursor()
 
-
+pending = False
 
 def check_user_exists(username):
     cur.execute(f"SELECT * FROM Users WHERE username='{username}'") #Query para percorrer por todos os registos o utilizador com aquele username
@@ -115,11 +115,13 @@ def signup(role):
         view.print_password_diferentes()
         repeatpassword = view.pedir_repeat_nova_password()
     mod.inserir_utilizador(username, password, role) #Chama a função no model para inserir o utilizador, role e password na base de dados
+    con.commit()
     view.print_registo_admin_sucesso()
 
 def inserir_espetaculo():
     name = view.pedir_nome_espetaculo() #Pede o nome do espetaculo ao user
     mod.inserir_espetaculo(name) #chama a função no model para inserir o espetaculo na tabela "Espetaculos"
+    con.commit()
     option = view.questao_novo_espetaculo() #Pergunta se pretende inserir datas para este novo espetaculo
     if option == "Sim":
         inserir_nova_data(name) #Chama a função para inserir datas
@@ -183,6 +185,7 @@ def inserir_nova_data(nome_espetaculo):
         inserir_nova_data(nome_espetaculo)
     else:
         mod.inserir_nova_data(nome_espetaculo, novadata) #Chama a função no mod para inserir a nova data na base de dados
+        con.commit()
         view.print_sessoa_adicionada_sucesso()
         view.askforenter()
         view.menuAdmin()
@@ -204,6 +207,7 @@ def alterar_password_by_utilizador(username):
                 view.print_password_diferentes()
                 repeatpassword = view.pedir_repeat_nova_password()
             mod.change_password(username, password) #Chama a função no mod para fazer as alterações na BD
+            con.commit()
             view.print_password_sucesso()
             view.askforenter()
             view.menuAdmin()
@@ -217,6 +221,7 @@ def alterar_password():
         view.print_password_diferentes()    
         repeatpassword = view.pedir_repeat_nova_password() #Pede a confirmação    
     mod.change_password(view.currentuser, password)
+    con.commit()
     view.print_password_sucesso()
     view.askforenter()
     view.main()
@@ -292,6 +297,7 @@ def reservar_bilhetes(espetaculo, data_espetaculo):
                 view.menuUser()
             elif decisao.upper() == "SIM":
                 inserir_novas_reservas(novareserva, data_espetaculo)
+                con.commit()
                 view.menuUser()
             else:
                 view.print_erro_input()
@@ -457,6 +463,7 @@ def cancelar_reserva():
     if espetaculo is not None:
         reserva = listar_reservas_utilizador(espetaculo) #PEDE A RESERVA
         mod.apagar_reserva(reserva) #CHAMA A FUNÇÃO NO MOD PARA APAGAR A RESERVA
+        con.commit()
         view.print_reserva_cancelada()
         view.askforenter()
         view.menuUser()
@@ -612,6 +619,7 @@ def remover_sessao(): #Remover sessão(data)
 def handle_inp(message):
     user_input = input(message)
     if user_input.upper() == "EXIT": #SE O USER ESCREVER EXIT, VOLTA PARA O MENU
+        con.rollback()
         if checkAdminLogin(view.currentuser):
             view.menuAdmin()
         else:
