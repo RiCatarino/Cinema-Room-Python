@@ -260,7 +260,10 @@ def listar_datas_espetaculo_para_reserva(espetaculo):
     else: #se não houver datas
         view.print_sem_datas()
         view.askforenter()
-        view.menuUser()
+        if checkAdminLogin(view.currentuser):
+            view.menuAdmin()
+        else:
+            view.menuUser()
 
 def inserir_nova_data(nome_espetaculo):
     if nome_espetaculo is None: #se não tiver passado um valor para a função (pode passar no caso de acabarmos de inserir um espetaculo)

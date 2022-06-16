@@ -1,7 +1,6 @@
 from ast import Break
 import sqlite3 #Biblioteca sqlite
 import os
-from py import process #Biblioteca com o intuito de detetar o SO para limpar o terminal
 from Models import model as mod
 from Controllers import controller as cont
 
@@ -33,6 +32,8 @@ def main():
 
 def menu_inicial():
     os.system('cls' if os.name == 'nt' else 'clear') # Limpa o terminal consoante o SO
+    global currentuser
+    currentuser = ""
     print("\n\033[95m\033[1m-------BEM-VINDO AO COOLISEU-----\033[0m")
     print("\033[92m\033[1m1. Iniciar Sessão\n2. Registar Utilizador\n3. Sair\033[95m")
     print_line()
@@ -220,7 +221,6 @@ def askforenter():
 def pedir_username():
     return cont.handle_inp("\n\033[95mUsername:\033[0m ")
 
-
 def pedir_password():
     return cont.handle_inp("\033[95mPassword:\033[0m ")
 
@@ -250,7 +250,7 @@ def pedir_ano():
 
 def pedir_mes():
     while True:
-        mes = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o mês(0-12): \033[0m")
+        mes = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o mês(1-12): \033[0m")
         try: #tenta converter o input em int
             mes = int(mes)#converte o input em int
             if mes > 0 and mes < 13:#Se o input for entre 1 e 12 devolve o input em tipo string
@@ -260,7 +260,7 @@ def pedir_mes():
 
 def pedir_dia():
     while True:
-        dia = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o dia(0-31): \033[0m")
+        dia = cont.handle_inp("\033[92m\033[1m\nPor favor, insira o dia(1-31): \033[0m")
         try:#tenta converter o input em int
             dia = int(dia) #converte o input em int
             if dia > 0 and dia < 32:#Se o input for entre 0 e 31 devolve o input em tipo string
@@ -319,10 +319,10 @@ def print_users(user):
         print(f"\033[91m\033[1m{user[0]}\033[1m") # SE ESTIVER BLOQUEADO
 
 def print_password_sucesso():
-    print("\n\033[34m\033[1m------Password Alterada com sucesso.------\033[0m\n")
+    print("\n\033[34m\033[1m------ Password Alterada com sucesso. ------\033[0m\n")
 
 def print_password_diferentes():
-    print("\n\033[91m\033[1m------As password não coincidem.------\033[0m\n")
+    print("\n\033[91m\033[1m------ As password não coincidem. ------\033[0m\n")
     
 def print_user_nao_existe():
     print("\n\033[91m\033[1mEsse Utilizador não existe.\033[0m")
@@ -360,7 +360,7 @@ def print_data_duplicada():
     print("\033[91m\033[1mEste espetáculo já tem uma sessão nessa data.\033[0m")
 
 def print_cabecalho_lista_espetaculos():
-    print("\n\033[95m\033[1m------Lista de Espetáculos------\033[0m")
+    print("\n\033[95m\033[1m------ Lista de Espetáculos ------\033[0m")
     
 def print_lista_espetaculos(i, espetaculo):
     print(f"\033[92m\033[1m{i}: {espetaculo[0]} \033[0m")
@@ -422,10 +422,10 @@ def print_lugar_ja_escolhido():
     print("\n\033[91mALERTA: Esse lugar já está escolhido.\n\033[0m")
 
 def print_sem_espetaculos_reservados():
-    print("\n------Não tem espetáculos reservados------")
+    print("\n------ Não tem espetáculos reservados ------")
     
 def print_cabecalho_lista_reservas():
-    print("\n------Lista de Reservas------")
+    print("\n------ Lista de Reservas ------")
 
 def print_lista_reservas(i, mapa_reservas, reserva):
     print(f"{i}: Data- {mapa_reservas.get(reserva)[0]} Bilhetes- {mapa_reservas.get(reserva)[1]}")
