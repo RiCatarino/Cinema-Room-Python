@@ -224,8 +224,11 @@ def listar_espetaculos(readonly):
         while True:
             try:
                 option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
-                selected = espetaculos[int(option) - 1] #converte em int
-                return selected
+                if int(option)> 0:
+                    selected = espetaculos[int(option) - 1] #converte em int
+                    return selected
+                else:
+                    view.print_erro_input
             except:
                 view.print_erro_input()
                 view.askforenter()
@@ -260,8 +263,11 @@ def listar_datas_espetaculo_para_reserva(espetaculo):
         view.print_line()
         while True:
             try:
-                option = view.pedir_escolha_data_espetaculo()
-                return datas[int(option) - 1]['id']
+                if int(option)> 0:
+                    option = view.pedir_escolha_data_espetaculo()
+                    return datas[int(option) - 1]['id']
+                else:
+                    view.print_erro_input()
             except:
                 view.print_erro_input()
     else: #se não houver datas
@@ -606,8 +612,11 @@ def listar_espetaculos_user(): #FUNÇÃO PARA LISTAR OS ESPETACULOS ONDE O USER 
     while True:
             try:
                 option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
-                selected = espetaculos[int(option) - 1] #converte em int
-                return selected
+                if int(option)> 0:
+                    selected = espetaculos[int(option) - 1] #converte em int
+                    return selected
+                else:
+                    view.print_erro_input()
             except:
                 view.print_erro_input()
                 view.askforenter()
@@ -625,7 +634,10 @@ def listar_reservas_utilizador(espetaculo): #lista as reservas do utilizador
     while True:
         try:
             option = view.pedir_escolha_reserva()
-            return reservas[int(option) - 1]
+            if int(option) > 0:
+                return reservas[int(option) - 1]
+            else:
+                view.print_erro_input()
         except:
             view.print_erro_input()
 
