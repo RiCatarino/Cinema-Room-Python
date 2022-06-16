@@ -26,3 +26,9 @@ SELECT data_espetaculo.data WHERE reserva ='{reserva}' AND
 SELECT * FROM User_espetaculo_lugar WHERE data_espetaculo = 8
 
 DELETE FROM User_espetaculo_lugar
+
+ALTER TABLE Users ADD COLUMN blocked TEXT
+SELECT blocked FROM Users
+UPDATE Users SET blocked = NULL WHERE username='t'
+SELECT username FROM Users WHERE blocked is NULL
+SELECT username FROM Users WHERE role='User' AND blocked is NULL

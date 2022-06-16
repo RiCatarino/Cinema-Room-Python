@@ -1,14 +1,18 @@
 import sqlite3
 from xmlrpc.client import DateTime
-
-from django.views import View
 from Models import model as mod
 from Views import view
+from importlib import reload
 
 con = sqlite3.connect('projeto.db')
 cur = con.cursor()
 
-pending = False
+def check_user_isblocked(username):
+    cur.execute(f"SELECT blocked FROM Users WHERE username='{username}'")
+    if cur.fetchone()[0] != None:
+        return True
+    else:
+        return False
 
 def check_user_exists(username):
     cur.execute(f"SELECT * FROM Users WHERE username='{username}'") #Query para percorrer por todos os registos o utilizador com aquele username
@@ -30,6 +34,54 @@ def checkAdminLogin(username):
         return True
     else:
         return False # Quer dizer que é utilizador normal
+    
+def bloquear_utilizador():
+    listar_utilizadores_ativos()
+    while True:
+        username = view.pedir_username() #Pede o nome do user
+        if username != view.currentuser:
+            if check_user_exists(username): #Se existir
+                if not check_user_isblocked(username): # SE O UTILIZADOR NÃO ESTIVER BLOQUEADO
+                    while True:
+                        confirmacao = view.pedir_confirmacao_bloquear(username)
+                        if confirmacao.upper() == "SIM":
+                            mod.bloquear_utilizador(username)
+                            view.print_bloqueio_sucesso()
+                            view.askforenter()
+                            view.menu_gestao_utilizadores()
+                        elif confirmacao.upper() == "Não":
+                            view.menu_gestao_utilizadores()
+                        else:
+                            view.print_erro_input()
+                else:
+                    view.print_erro_utilizador_ja_bloqueado()
+            else:
+                view.print_user_nao_existe()
+        else:
+            view.print_erro_bloquear_a_si_mesmo()
+        
+
+def desbloquear_utilizador():
+    listar_utilizadores_bloqueados()
+    while True:
+        username = view.pedir_username() #Pede o nome do user
+        if check_user_exists(username): #Se existir
+            if check_user_isblocked(username): #SE O UTILIZADOR ESTIVER BLOQUEADO
+                while True:
+                    confirmacao = view.pedir_confirmacao_desbloquear(username)
+                    if confirmacao.upper() == "SIM":
+                        mod.desbloquear_utilizador(username)
+                        view.print_desbloqueio_sucesso()
+                        view.askforenter()
+                        view.menu_gestao_utilizadores()
+                    elif confirmacao.upper() == "Não":
+                        view.menu_gestao_utilizadores()
+                    else:
+                        view.print_erro_input()
+            else:
+                view.print_utilizador_naobloqueado()
+        else:
+            view.print_user_nao_existe()
 
 def verificar_data_duplicada(name, date):
     cur.execute(f"SELECT * FROM Datas_espetaculo WHERE data='{DateTime(date)}' AND espetaculo='{name}'") #Query para verificar se já existe a data para o respetivo espetaculo
@@ -59,8 +111,11 @@ def convert_letters_in_numbers(lista, letras): #CONVERTE AS LETRAS EM NÚMEROS
     for item in range(0, len(lista)): #por cada item dentro da lista de reservas
         list_to_print.append(str(lista[item]).split(" ")) #Adiciona o item e separa com espaço "0 1", "0 2", em vez de "01" ou "02".
     for item in range(0, len(list_to_print)):# Ciclo para percorrer a lista a enviar para a sala
-        if list_to_print[item] != ['']: #Se for diferente de ''(bug ao converter)
+        try:
             view.sala[int(list_to_print[item][0])][int(list_to_print[item][1]) - 1] = "\033[91m x \033[0m" #Muda o lugar vazio para "x", conforme o respetivo indíce. (0, 1) (0, 2) 
+        except Exception as ex:
+            print(ex)
+
 
 def check_if_is_full(): #Verifica se existem lugares disponiveis
     for i in range(0, 11):
@@ -97,38 +152,59 @@ def login():
     username = view.pedir_username() #Pede username
     password = view.pedir_password() #Pede a password
     if checkUserLogin(username, password): #Se as credenciais estiverem corretas
-        view.currentuser = username #atribui o utilizador atual ao username inserido
-        if checkAdminLogin(username): #Verifica se é admin, se for encaminha para o menuadmin
-            view.menuAdmin()
+        if not check_user_isblocked(username):
+            view.currentuser = username #atribui o utilizador atual ao username inserido
+            if checkAdminLogin(username): #Verifica se é admin, se for encaminha para o menuadmin
+                view.menuAdmin()
+            else:
+                view.menuUser() # se não, encaminha para o menuuser
         else:
-            view.menuUser() # se não, encaminha para o menuuser
+            view.print_utilizador_bloqueado()
+            view.askforenter()
+            view.menu_inicial()
     else:
         view.print_password_errada()
         login() #volta a chamar a função caso o username ou a password estiverem incorretos
 
 
 def signup(role):
-    username = view.pedir_username() #Pede username
-    password = view.pedir_password() #Pede a password
-    repeatpassword = view.pedir_repeat_nova_password() #Pede para confirmar a password
-    while password != repeatpassword: #Enquanto as passwords forem diferentes, solicita a confirmação da password
-        view.print_password_diferentes()
-        repeatpassword = view.pedir_repeat_nova_password()
-    mod.inserir_utilizador(username, password, role) #Chama a função no model para inserir o utilizador, role e password na base de dados
-    con.commit()
-    view.print_registo_admin_sucesso()
+    while True:
+        username = view.pedir_username() #Pede username
+        if check_user_exists(username):
+            view.print_user_existe()
+        else:
+            password = view.pedir_password() #Pede a password
+            repeatpassword = view.pedir_repeat_nova_password() #Pede para confirmar a password
+            while True:
+                if password == repeatpassword: #Enquanto as passwords forem diferentes, solicita a confirmação da password
+                    mod.inserir_utilizador(username, password, role) #Chama a função no model para inserir o utilizador, role e password na base de dados
+                    view.print_registo_admin_sucesso()
+                    return
+                else:
+                    view.print_password_diferentes()
+                    repeatpassword = view.pedir_repeat_nova_password()
+
+def check_espetaculo_exists(nome):
+    for item in cur.execute("SELECT * FROM Espetaculos"):
+        if item[0] == nome:
+            return True
+    return False
 
 def inserir_espetaculo():
-    name = view.pedir_nome_espetaculo() #Pede o nome do espetaculo ao user
-    mod.inserir_espetaculo(name) #chama a função no model para inserir o espetaculo na tabela "Espetaculos"
-    con.commit()
-    option = view.questao_novo_espetaculo() #Pergunta se pretende inserir datas para este novo espetaculo
-    if option == "Sim":
-        inserir_nova_data(name) #Chama a função para inserir datas
-    else:
-        view.menuAdmin()
+    while True:
+        nome = view.pedir_nome_espetaculo() #Pede o nome do espetaculo ao user
+        if not check_espetaculo_exists(nome):
+            mod.inserir_espetaculo(nome) #chama a função no model para inserir o espetaculo na tabela "Espetaculos"
+            option = view.questao_novo_espetaculo() #Pergunta se pretende inserir datas para este novo espetaculo
+            if option == "Sim":
+                inserir_nova_data(nome) #Chama a função para inserir datas
+            else:
+                view.menu_espetaculos()
+        else:
+            view.print_erro_espetaculo_existe()
+        
 
-def listar_espetaculos():
+def listar_espetaculos(readonly):
     i = 0
     view.print_cabecalho_lista_espetaculos()
     espetaculos = []
@@ -137,27 +213,40 @@ def listar_espetaculos():
         espetaculos.append(espetaculo[0]) #Insere na lista de espetaculos o valor devolvido
         view.print_lista_espetaculos(i, espetaculo) #dá print ao espetaculo devolvido, juntamente com o indíce atual do ciclo
     view.print_line()
-    while True:
-        try:
-            option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
-            selected = espetaculos[int(option) - 1] #converte em int
-            return selected
-        except:
-            view.print_erro_input()
+    if not readonly: #SE NÃO FOR SÓ PARA VER OS ESPETACULOS
+        while True:
+            try:
+                option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
+                selected = espetaculos[int(option) - 1] #converte em int
+                return selected
+            except:
+                view.print_erro_input()
+                view.askforenter()
+                
+def listar_sessoes_espetaculo():
+    espetaculo = listar_espetaculos(False)
+    listar_datas_espetaculo(espetaculo)
+    
 
-def listar_datas_espetaculo(nome): #Lista os espetaculos
-    view.print_cabecalho_lista_datas(nome)
+def listar_datas_espetaculo(espetaculo): #Lista os espetaculos
+    view.print_cabecalho_lista_datas(espetaculo)
     view.print_line()
-    for date in cur.execute(f"SELECT data FROM Datas_espetaculo WHERE espetaculo='{nome}'"):
-        view.print_lista_datas(date)
+    dates = []
+    for date in cur.execute(f"SELECT data FROM Datas_espetaculo WHERE espetaculo='{espetaculo}'"):
+        dates.append(date)
+    if dates:
+        for date in dates:
+            view.print_lista_datas(date)
+    else:
+        view.print_sem_datas()
     view.print_line()
 
-def listar_datas_espetaculo_para_reserva(nome):
+def listar_datas_espetaculo_para_reserva(espetaculo):
     datas = []
-    for data in cur.execute(f"SELECT id, data FROM Datas_espetaculo WHERE espetaculo='{nome}'"): #Query para devolver as datas do respetivo espetaculo
+    for data in cur.execute(f"SELECT id, data FROM Datas_espetaculo WHERE espetaculo='{espetaculo}'"): #Query para devolver as datas do respetivo espetaculo
         datas.append({"id": data[0], "data": data[1]}) #adiciona o valor devolvido à lista de datas
     if datas: #se houver datas para o espetaculo
-        view.print_cabecalho_lista_datas(nome)
+        view.print_cabecalho_lista_datas(espetaculo)
         view.print_line()
         for i in range(0, len(datas)): #dá print a cada valor dentro da lista de datas
             view.print_lista_datas_para_reserva(i, datas)
@@ -170,11 +259,12 @@ def listar_datas_espetaculo_para_reserva(nome):
                 view.print_erro_input()
     else: #se não houver datas
         view.print_sem_datas()
-        reservar_bilhetes(None, None) #volta ao menu de reservas de bilhetes
+        view.askforenter()
+        view.menuUser()
 
 def inserir_nova_data(nome_espetaculo):
     if nome_espetaculo is None: #se não tiver passado um valor para a função (pode passar no caso de acabarmos de inserir um espetaculo)
-        nome_espetaculo = listar_espetaculos() #Pede para escolher o espetaculo
+        nome_espetaculo = listar_espetaculos(False) #Pede para escolher o espetaculo
         listar_datas_espetaculo(nome_espetaculo) #Lista as datas para o mesmo
     ano = view.pedir_ano()
     mes = view.pedir_mes() #PEDE A DATA
@@ -185,19 +275,29 @@ def inserir_nova_data(nome_espetaculo):
         inserir_nova_data(nome_espetaculo)
     else:
         mod.inserir_nova_data(nome_espetaculo, novadata) #Chama a função no mod para inserir a nova data na base de dados
-        con.commit()
         view.print_sessoa_adicionada_sucesso()
         view.askforenter()
-        view.menuAdmin()
+        view.menu_espetaculos()
 
-def listar_utilizadores(): #Lista os utilizadores
+def listar_todos_os_utilizadores():
     view.print_cabecalho_lista_users()
-    for user in cur.execute("SELECT username FROM Users WHERE role='User'"): #Query para selecionar todos os utilizador com o role "user"
+    for user in cur.execute("SELECT username, blocked FROM Users"): #Query para selecionar todos os utilizador com o role "user"
         view.print_users(user)
         view.print_line()
 
+def listar_utilizadores_ativos(): #Lista os utilizadores
+    view.print_cabecalho_lista_users()
+    for user in cur.execute("SELECT username, blocked FROM Users WHERE role='User' AND blocked is NULL"): #Query para selecionar todos os utilizador com o role "user"
+        view.print_users(user)
+        view.print_line()
+        
+def listar_utilizadores_bloqueados():
+    view.print_cabecalho_lista_users()
+    for user in cur.execute("SELECT username, blocked FROM Users WHERE role='User' AND blocked = 'True'"): #Query para selecionar todos os utilizador com o role "user"
+        view.print_users(user)
+        view.print_line()
 def alterar_password_by_utilizador(username):
-    listar_utilizadores()
+    listar_utilizadores_ativos()
     while True:
         username = view.pedir_username() #Pede o nome do user
         if check_user_exists(username): #Se existir
@@ -207,10 +307,9 @@ def alterar_password_by_utilizador(username):
                 view.print_password_diferentes()
                 repeatpassword = view.pedir_repeat_nova_password()
             mod.change_password(username, password) #Chama a função no mod para fazer as alterações na BD
-            con.commit()
             view.print_password_sucesso()
             view.askforenter()
-            view.menuAdmin()
+            view.menu_gestao_utilizadores()
         else:
             view.print_user_nao_existe()
 
@@ -221,10 +320,9 @@ def alterar_password():
         view.print_password_diferentes()    
         repeatpassword = view.pedir_repeat_nova_password() #Pede a confirmação    
     mod.change_password(view.currentuser, password)
-    con.commit()
     view.print_password_sucesso()
     view.askforenter()
-    view.main()
+    view.menu_inicial()
 
 def lugares_sala(): #Devolve todos os ids da tabela lugares
     cur.execute(
@@ -238,7 +336,10 @@ def lugares_sala_reservados(data_espetaculo): #Devolve todos os lugares reservad
 
 def escolha_quantidade(lugares_possiveis): #Solicita a quantidade de bilhetes, se for menor que 0, inválido ou maior que o número de lugares disponíveis, dá os respetivos prints
     while True:
-        quantidade = view.pedir_quantidade_bilhetes()
+        try:
+            quantidade = view.pedir_quantidade_bilhetes()
+        except Exception as ex:
+            print(ex)
         if quantidade.isnumeric(): #Se for um número
             if int(quantidade) > 0:
                 if int(quantidade) <= lugares_possiveis:
@@ -262,17 +363,22 @@ def inserir_novas_reservas(novareserva, data_espetaculo):#Insere as novas reserv
     view.askforenter()
 
 def ver_sala():#Pede o espetaculo, a data, solicita os lugares reservados naquela data (id), converte as letras em números e preenche a variável sala, depois dá o print da mesma
-    espetaculo = listar_espetaculos()
+    espetaculo = listar_espetaculos(False)
     data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo)
     lugares_reservados = lugares_sala_reservados(data_espetaculo)
     convert_letters_in_numbers(lugares_reservados, view.letras)
     view.mostrar_sala()
     
+def reloadview():
+    user = view.currentuser
+    reload(view)
+    view.currentuser = user
 
 def reservar_bilhetes(espetaculo, data_espetaculo):
+    reloadview()
     novareserva = [] #Variável para as novas reservas
     if espetaculo is None: # Se não for passado nenhum espetáculo
-        espetaculo = listar_espetaculos() #Pede o espetaculo
+        espetaculo = listar_espetaculos(False) #Pede o espetaculo
         data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo) #Pede a data do respetivo espetaculo
     lugares = lugares_sala() #Pede à base de dados todos os lugares
     lugares_reservados = lugares_sala_reservados(data_espetaculo) #Pede à BD todos os lugares reservados naquela data (id)
@@ -319,6 +425,7 @@ def escolha_manual(quantidade, lugares, lugares_disponiveis):
     return novareserva
 
 def escolha_auto(quantidade):
+    all = 0 #Variável para perceber se consegue por todos juntos no meio
     novareserva = []
     if quantidade == 2: # SE FOREM 2 RESERVAS, PROCURA NOS LUGARES DA ESQUERDA E DA DIREITA, PARA FICAREM JUNTOS
         for i in range(0, 11): #PROCURA NA FILA DA ESQUERDA
@@ -335,12 +442,17 @@ def escolha_auto(quantidade):
     else: #SE NÃO FOREM SÓ 2
         for i in range(0, 11): #PROCURA NO MEIO
             if quantidade - len(novareserva) > 1: #SE FOR MAIS QUE 1 BILHETE A FALTAR 
-                all = 0 #Variável para perceber se consegue por todos juntos no meio
                 for k in range(2, 12):
-                    if view.sala[i][k] == " ▢ ": #Se o lugar estiver vazio 
-                        all += 1 #adiciona um ao all
-                    else:
-                        all -= 1 #retira 1 
+                    # print(f"all: {all}, quantidade: {quantidade}")
+                    if all < quantidade:
+                        if view.sala[i][k] == " ▢ " or view.sala[i][k] == "VIP": #Se o lugar estiver vazio
+                                # print(i,k)
+                                all += 1 #adiciona um ao all
+                                # input()
+                                # print(all)
+                        else:
+                            all = 0
+                        
                 if all >= quantidade or all == 10: #SE ALL for maior ou igual à quantidade ou for 10(máximo no meio)
                     for k in range(2, 12): #Ciclo para adicionar os lugares todos a linha atual
                         if (view.sala[i][k] == " ▢ ") and f"sala[i]{k + 1}" not in novareserva:  #Se já não estiverem na lista da novareserva
@@ -463,7 +575,6 @@ def cancelar_reserva():
     if espetaculo is not None:
         reserva = listar_reservas_utilizador(espetaculo) #PEDE A RESERVA
         mod.apagar_reserva(reserva) #CHAMA A FUNÇÃO NO MOD PARA APAGAR A RESERVA
-        con.commit()
         view.print_reserva_cancelada()
         view.askforenter()
         view.menuUser()
@@ -483,12 +594,13 @@ def listar_espetaculos_user(): #FUNÇÃO PARA LISTAR OS ESPETACULOS ONDE O USER 
         return None
     print("---------------------------------")
     while True:
-        try:
-            option = view.pedir_escolha_espetaculo()
-            selected = espetaculos[int(option) - 1]
-            return selected
-        except:
-            view.print_input()
+            try:
+                option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
+                selected = espetaculos[int(option) - 1] #converte em int
+                return selected
+            except:
+                view.print_erro_input()
+                view.askforenter()
 
 def listar_reservas_utilizador(espetaculo): #lista as reservas do utilizador
     i = 0
@@ -562,7 +674,7 @@ def bilheteira_por_ano():
     view.menuBilheteira()
 
 def bilheteira_por_espetaculo():
-    espetaculo = listar_espetaculos() #PEDE O ESPETACULO
+    espetaculo = listar_espetaculos(False) #PEDE O ESPETACULO
     datas = [] #LISTA PARA AS DATAS
     total = 0
     for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE espetaculo='{espetaculo}'"): #SELECIONA AS DATAS DO RESPETIVO ESPETACULO
@@ -573,7 +685,7 @@ def bilheteira_por_espetaculo():
     view.menuBilheteira()
 
 def bilheteira_por_sessao():
-    espetaculo = listar_espetaculos() #PEDE O ESPETACULO
+    espetaculo = listar_espetaculos(False) #PEDE O ESPETACULO
     data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo) #PEDE A DATA
     lugares_reservados = lugares_sala_reservados(data_espetaculo) #PROCURA OS LUGARES RESERVADOS
     total = 0
@@ -587,7 +699,7 @@ def bilheteira_por_sessao():
     view.menuBilheteira()
     
 def remover_espetaculo():
-    espetaculo = listar_espetaculos() #PEDE O ESPETACULO
+    espetaculo = listar_espetaculos(False) #PEDE O ESPETACULO
     cur.execute(f"SELECT id FROM Datas_espetaculo WHERE espetaculo = '{espetaculo}'") #PROCURA AS DATAS DO ESPETACULO
     datas = cur.fetchall()
     for data in datas:
@@ -595,26 +707,31 @@ def remover_espetaculo():
     for data in datas:
         cur.execute(f"DELETE FROM Datas_espetaculo WHERE id='{data[0]}'") #ELIMINA AS DATAS DO ESPETACULO
     cur.execute(f"DELETE FROM Espetaculos WHERE nome='{espetaculo}'") #ELIMINA O ESPETACULO
+    con.commit()
     view.print_sucesso_remocao(espetaculo)
     view.askforenter()
-    view.menuAdmin()
+    view.menu_espetaculos()
     
 def remover_sessao(): #Remover sessão(data)
-    espetaculo = listar_espetaculos() #Pede o espetaculo ao admin
+    espetaculo = listar_espetaculos(False) #Pede o espetaculo ao admin
     id_data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo) #solicita o id da data do espetaculo
-    cur.execute(f"SELECT data FROM Datas_espetaculo WHERE id='{id_data_espetaculo}'") #procura pela data com esse id
-    data_espetaculo = cur.fetchone()[0]
-    cur.execute(f"SELECT lugar FROM User_espetaculo_lugar WHERE data_espetaculo='{id_data_espetaculo}'") #Procura pelas reservas nessa data
-    reservas = cur.fetchall() #atribui o resultado à variável reservas
-    decisao = view.confirmar_remocao_sessao(len(reservas)).upper() #Pede confirmação ao user com o nº de reservas
-    if decisao == "SIM":
-        cur.execute(f"DELETE FROM User_espetaculo_lugar WHERE data_espetaculo ='{id_data_espetaculo}'") #ELIMINA AS RESERVAS NESSA DATA
-        cur.execute(f"DELETE FROM Datas_espetaculo WHERE id='{id_data_espetaculo}'") #ELIMINA A DATA
-        view.print_sucesso_remocao_sessao(data_espetaculo, espetaculo)
-        view.askforenter()
-        view.menuAdmin()
+    if id_data_espetaculo != None:
+        cur.execute(f"SELECT data FROM Datas_espetaculo WHERE id='{id_data_espetaculo}'") #procura pela data com esse id
+        data_espetaculo = cur.fetchone()[0]
+        cur.execute(f"SELECT lugar FROM User_espetaculo_lugar WHERE data_espetaculo='{id_data_espetaculo}'") #Procura pelas reservas nessa data
+        reservas = cur.fetchall() #atribui o resultado à variável reservas
+        decisao = view.confirmar_remocao_sessao(len(reservas)).upper() #Pede confirmação ao user com o nº de reservas
+        if decisao == "SIM":
+            cur.execute(f"DELETE FROM User_espetaculo_lugar WHERE data_espetaculo ='{id_data_espetaculo}'") #ELIMINA AS RESERVAS NESSA DATA
+            cur.execute(f"DELETE FROM Datas_espetaculo WHERE id='{id_data_espetaculo}'") #ELIMINA A DATA
+            con.commit()
+            view.print_sucesso_remocao_sessao(data_espetaculo, espetaculo)
+            view.askforenter()
+            view.menu_espetaculos()
+        else:
+            view.menu_espetaculos()
     else:
-        view.menuAdmin()
+        return
 
 def handle_inp(message):
     user_input = input(message)
