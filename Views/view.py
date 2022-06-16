@@ -55,7 +55,7 @@ def menu_inicial():
 def menuAdmin():
     os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
     print(f"\n\033[95m\033[1m---------- Olá administrador {currentuser} ----------\033[0m") #Print com o nome do utilizador
-    print("\n\033[92m\033[1m1. Espetáculos \n2. Gestão de Utilizadores\n3. Bilheteira  \n4. Sair\033[0m")
+    print("\n\033[92m\033[1m1. Gestão de Espetáculos \n2. Gestão de Utilizadores\n3. Gestão de Bilheteira  \n4. Sair\033[0m")
     while True:
         try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
             option = int(input("\n\033[1mOpção: \033[0m"))#Pede input ao utilizador e tenta converter em int
