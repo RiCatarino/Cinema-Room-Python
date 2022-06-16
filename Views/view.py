@@ -112,7 +112,7 @@ def menu_espetaculos():
 def menu_gestao_utilizadores():
     os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
     print(f"\n\033[95m\033[1m---------- Menu de Gestão de Utilizadores ----------\033[0m") #Print com o nome do utilizador
-    print("\n\033[92m\033[1m1. Listar Utilizadores \n2. Alterar password de um cliente\n3. Alterar password\n4. Registar novo administrador\n5. Bloquear Utilizador\n6. Desbloquear Utilizador\n7. Voltar\033[0m")
+    print("\n\033[92m\033[1m1. Listar Utilizadores \n2. Alterar password de um Utilizador\n3. Alterar password\n4. Registar novo Administrador\n5. Bloquear Utilizador\n6. Desbloquear Utilizador\n7. Voltar\033[0m")
     while True:
         try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
             option = int(input("\n\033[1mOpção: \033[0m"))#Pede input ao utilizador e tenta converter em int
@@ -231,10 +231,10 @@ def pedir_repeat_nova_password():
     return cont.handle_inp("\033[1mRepita a nova password: \033[0m")
 
 def pedir_confirmacao_bloquear(username):
-    return cont.handle_inp(f"\033[91m\033[1mPretende bloquear o utilizador {username}? (Sim/Não)")
+    return cont.handle_inp(f"\033[91m\033[1mPretende bloquear o utilizador {username}? (Sim/Não):\033[0m ")
 
 def pedir_confirmacao_desbloquear(username):
-    return cont.handle_inp(f"\033[91m\033[1mPretende desbloquear o utilizador {username}? (Sim/Não)")
+    return cont.handle_inp(f"\033[91m\033[1mPretende desbloquear o utilizador {username}? (Sim/Não):\033[0m ")
 
 #DATAS E ESPETACULOS
 

@@ -49,7 +49,7 @@ def bloquear_utilizador():
                             view.print_bloqueio_sucesso()
                             view.askforenter()
                             view.menu_gestao_utilizadores()
-                        elif confirmacao.upper() == "Não":
+                        elif confirmacao.upper() == "NÃO":
                             view.menu_gestao_utilizadores()
                         else:
                             view.print_erro_input()
@@ -74,7 +74,7 @@ def desbloquear_utilizador():
                         view.print_desbloqueio_sucesso()
                         view.askforenter()
                         view.menu_gestao_utilizadores()
-                    elif confirmacao.upper() == "Não":
+                    elif confirmacao.upper() == "NÃO":
                         view.menu_gestao_utilizadores()
                     else:
                         view.print_erro_input()
