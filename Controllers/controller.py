@@ -261,7 +261,7 @@ def listar_datas_espetaculo_para_reserva(espetaculo):
         view.print_sem_datas()
         view.askforenter()
         if checkAdminLogin(view.currentuser):
-            view.menuAdmin()
+            view.menu_espetaculos()
         else:
             view.menuUser()
 
@@ -366,6 +366,7 @@ def inserir_novas_reservas(novareserva, data_espetaculo):#Insere as novas reserv
     view.askforenter()
 
 def ver_sala():#Pede o espetaculo, a data, solicita os lugares reservados naquela data (id), converte as letras em números e preenche a variável sala, depois dá o print da mesma
+    reload(view)
     espetaculo = listar_espetaculos(False)
     data_espetaculo = listar_datas_espetaculo_para_reserva(espetaculo)
     lugares_reservados = lugares_sala_reservados(data_espetaculo)
@@ -441,9 +442,8 @@ def escolha_auto(quantidade):
                     novareserva.append(f"{view.letras[i]}{13}")
                     novareserva.append(f"{view.letras[i]}{14}")
                     return novareserva
-    
-    else: #SE NÃO FOREM SÓ 2
-        for i in range(0, 11): #PROCURA NO MEIO
+    #SE NÃO FOREM SÓ 2
+    for i in range(0, 11): #PROCURA NO MEIO
             if quantidade - len(novareserva) > 1: #SE FOR MAIS QUE 1 BILHETE A FALTAR 
                 for k in range(2, 12):
                     # print(f"all: {all}, quantidade: {quantidade}")
@@ -464,7 +464,7 @@ def escolha_auto(quantidade):
                                 return novareserva
                             
         #SE NÃO OS CONSEGUIR JUNTAR TODOS, TENTA POR DE 2 EM 2 NO MEIO
-        for i in range(0, 11):
+    for i in range(0, 11):
             for j in range(2, 12):
                 if quantidade - len(novareserva) > 1:
                     if (view.sala[i][j] == " ▢ " and view.sala[i][j + 1] == " ▢ ") or (
@@ -476,7 +476,7 @@ def escolha_auto(quantidade):
                             novareserva.append(f"{view.letras[i]}{j + 2}")
                                 
         #PROCURA DE 2 EM 2 PELA ESQUERDA
-        for i in range(0, 11):
+    for i in range(0, 11):
             if quantidade - len(novareserva) > 1:
                 if view.sala[i][0] == " ▢ " and view.sala[i][1] == " ▢ ":
                     if f"{view.letras[i]}{1}" in novareserva or f"{view.letras[i]}{2}" in novareserva: #SE JÁ NÃO ESTIVER NA LISTA DE RESERVAS
@@ -487,7 +487,7 @@ def escolha_auto(quantidade):
             else:
                 break
         #PROCURA DE 2 EM 2 PELA DIREITA
-        for i in range(0, 11):
+    for i in range(0, 11):
             if quantidade - len(novareserva) > 1:
                 if view.sala[i][12] == " ▢ " and view.sala[i][13] == " ▢ ":
                     if f"{view.letras[i]}{13}" in novareserva or f"{view.letras[i]}{14}" in novareserva:
@@ -499,7 +499,7 @@ def escolha_auto(quantidade):
                 break
         ##SE SÓ SOBRAR 1
         ##PROCURA NO MEIO POR UM LUGAR VAZIO ENTRE 2 OCUPADOS
-        for i in range(0, 11):
+    for i in range(0, 11):
             for j in range(2, 12):
                 if 2 < j < 11:
                     if view.sala[i][j - 1] != " ▢ " and view.sala[i][j] == " ▢ " and view.sala[i][j + 1] != " ▢ ":
@@ -523,7 +523,7 @@ def escolha_auto(quantidade):
                 if len(novareserva) == quantidade:
                     return novareserva
         #PROCURA NA ESQUERDA E DIREITA POR UM LUGAR VAZIO AO LADO DE OUTRO OCUPADO
-        for i in range(0, 11):
+    for i in range(0, 11):
             if view.sala[i][0] == " ▢ " and view.sala[i][1] != " ▢ ":
                 if f"{view.letras[i]}{1}" in novareserva:
                     pass
@@ -536,7 +536,7 @@ def escolha_auto(quantidade):
                     novareserva.append(f"{view.letras[i]}{2}")
             if len(novareserva) == quantidade:
                 return novareserva
-        for i in range(0, 11):
+    for i in range(0, 11):
             if view.sala[i][12] == " ▢ " and view.sala[i][13] != " ▢ ":
                 if f"{view.letras[i]}{13}" in novareserva:
                     pass
@@ -550,7 +550,7 @@ def escolha_auto(quantidade):
             if len(novareserva) == quantidade:
                 return novareserva
         #CASO NÃO ENCONTRAR, PROCURA PELO PRIMEIRO LUGAR VAZIO QUE ENCONTRAR
-        for i in range(0, 11):
+    for i in range(0, 11):
             for j in range(0, 13):
                 if view.sala[i][j] == " ▢ ":
                     if f"{view.letras[i]}{j + 1}" in novareserva:
