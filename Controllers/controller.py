@@ -154,11 +154,9 @@ def login():
     if checkUserLogin(username, password): #Se as credenciais estiverem corretas
         if not check_user_isblocked(username):
             view.currentuser = username #atribui o utilizador atual ao username inserido
-            print(view.currentuser)
             if checkAdminLogin(username): #Verifica se é admin, se for encaminha para o menuadmin
                 view.menuAdmin()
             else:
-                view.askforenter()
                 view.menuUser() # se não, encaminha para o menuuser
         else:
             view.print_utilizador_bloqueado()
