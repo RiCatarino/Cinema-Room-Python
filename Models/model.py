@@ -23,6 +23,7 @@ def change_password(username, password):
     
 def apagar_reserva(reserva):
     cur.execute(f"DELETE FROM User_espetaculo_lugar WHERE reserva='{reserva}'")
+    cur.execute(f"DELETE FROM Reservas WHERE id='{reserva}'")
     con.commit()
 
 def bloquear_utilizador(username):

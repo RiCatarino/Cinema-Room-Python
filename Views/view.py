@@ -297,8 +297,8 @@ def pedir_confirmacao_total_reserva(novareserva):
         
     return cont.handle_inp(f"\n\033[91mO total da sua reserva é \033[94m{cont.get_total_reserva(novareserva)}€\033[91m, para os bilhetes \033[94m{stringreservas}\033[91mpretende continuar (Sim/Não) ? \033[0m")
 
-def pedir_lugar():
-    return cont.handle_inp("\033[1mEscolha o lugar: \033[0m").upper()
+def pedir_lugar(n):
+    return cont.handle_inp(f"\033[1mEscolha o lugar nº \033[92m{n}\033[0m\033[1m : \033[0m").upper()
     
 def pedir_escolha_reserva():
     return cont.handle_inp("\033[1mEscolha a Reserva: \033[0m")
@@ -403,7 +403,7 @@ def print_sessoa_adicionada_sucesso():
     print("\n\033[95m\033[1m---------- Sessão adicionada com sucesso. ----------\033[0m")
 
 def print_erro_input():
-        print("\033[91m\033[1mEssa opção não existe.\033[0m") # Se o input não for um número
+        print("\033[91m\033[1m\nEssa opção não existe.\033[0m") # Se o input não for um número
     
 
 ##RESERVAS
@@ -415,10 +415,7 @@ def print_maior_que_zero():
 
 def print_numero_invalido():
     print("\033[91mTem de inserir um número válido.\033[0m")
-    
-def print_lugares_reservados(lugares):
-    print(f"\n\033[33m\033[1mLugares reservados: {lugares}\033[0m")
-    
+
 def print_reserva_sucesso():
     print("\n\033[94m\033[1m----------Lugares reservados com sucesso----------\033[0m")
     

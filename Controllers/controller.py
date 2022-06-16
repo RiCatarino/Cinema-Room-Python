@@ -380,9 +380,9 @@ def inserir_novas_reservas(novareserva, data_espetaculo):#Insere as novas reserv
         cur.execute(
             f"INSERT INTO User_espetaculo_lugar(user, data_espetaculo, lugar, reserva) VALUES('{view.currentuser}', '{data_espetaculo}', '{lugar}', '{ultima_reserva}')")
         lugares += lugar + " "
-    view.print_lugares_reservados(lugares)
+    # view.print_lugares_reservados(lugares)
     view.print_reserva_sucesso()
-    view.askforenter()
+
 
 def ver_sala():#Pede o espetaculo, a data, solicita os lugares reservados naquela data (id), converte as letras em números e preenche a variável sala, depois dá o print da mesma
     reload(view)
@@ -410,8 +410,8 @@ def reservar_bilhetes(espetaculo, data_espetaculo):
         convert_letters_in_numbers(lugares_reservados, view.letras) #Converte as letras em números para preencher a sala
         view.mostrar_sala()
         quantidade = escolha_quantidade(len(lugares_disponiveis)) #solicita a quantidade
-        manual_or_auto = view.pedir_manual_auto() #pergunta se a escolha é manual ou auto
         while True:
+            manual_or_auto = view.pedir_manual_auto() #pergunta se a escolha é manual ou auto
             if manual_or_auto == "Manual": #se for manual
                 novareserva = escolha_manual(quantidade, lugares, lugares_disponiveis)
                 break
@@ -427,6 +427,7 @@ def reservar_bilhetes(espetaculo, data_espetaculo):
             elif decisao.upper() == "SIM":
                 inserir_novas_reservas(novareserva, data_espetaculo)
                 con.commit()
+                view.askforenter()
                 view.menuUser()
             else:
                 view.print_erro_input()
@@ -436,14 +437,17 @@ def reservar_bilhetes(espetaculo, data_espetaculo):
 
 def escolha_manual(quantidade, lugares, lugares_disponiveis):
     novareserva = []
-    for i in range(0, quantidade): #CICLO Para a quantidade de bilhetes
-        lugar = view.pedir_lugar() #Pede o lugar
+    i = 0
+    while i < quantidade: #CICLO Para a quantidade de bilhetes
+        lugar = view.pedir_lugar(i+1) #Pede o lugar
         if lugar not in lugares: #Se o lugar não estiver na lista de lugares
             view.print_lugar_inexistente()
+            
         else:
             if lugar not in lugares_disponiveis or lugar in novareserva: #Se estiver já estiver reservado
                 view.print_lugar_ja_escolhido()
             else:
+                i += 1
                 novareserva.append(lugar) #adiciona o lugar à nova reserva
     return novareserva
 
@@ -463,6 +467,7 @@ def escolha_auto(quantidade):
                     return novareserva
     #SE NÃO FOREM SÓ 2
     for i in range(0, 11): #PROCURA NO MEIO
+            all = 0
             if quantidade - len(novareserva) > 1: #SE FOR MAIS QUE 1 BILHETE A FALTAR 
                 for k in range(2, 12):
                     # print(f"all: {all}, quantidade: {quantidade}")

@@ -33,3 +33,6 @@ UPDATE Users SET blocked = NULL WHERE username='t'
 SELECT username FROM Users WHERE blocked is NULL
 SELECT username FROM Users WHERE role='User' AND blocked is NULL
 DELETE FROM Users WHERE username = ""
+DELETE FROM Reservas
+DELETE FROM Users
+INSERT INTO Users VALUES("admin", "admin", "admin", NULL)
