@@ -75,7 +75,7 @@ def menuAdmin():
     
 def menu_espetaculos():
     os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
-    print(f"\n\033[95m\033[1m---------- Menu de Espetáculos ----------\033[0m") #Print com o nome do utilizador
+    print(f"\n\033[95m\033[1m---------- Gestão de Espetáculos ----------\033[0m") #Print com o nome do utilizador
     print("\n\033[92m\033[1m1. Lista de espetáculos\n2. Listar sessões de um espetáculo\n3. Inserir Espetáculo\n4. Remover Espetáculo \n5. Remover sessão \n6. Inserir nova data do espetáculo\n7. Ver sala por sessão \n8. Voltar\033[0m")
     while True:
         try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
@@ -111,7 +111,7 @@ def menu_espetaculos():
 
 def menu_gestao_utilizadores():
     os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
-    print(f"\n\033[95m\033[1m---------- Menu de Gestão de Utilizadores ----------\033[0m") #Print com o nome do utilizador
+    print(f"\n\033[95m\033[1m---------- Gestão de Utilizadores ----------\033[0m") #Print com o nome do utilizador
     print("\n\033[92m\033[1m1. Listar Utilizadores \n2. Alterar password de um Utilizador\n3. Alterar password\n4. Registar novo Administrador\n5. Bloquear Utilizador\n6. Desbloquear Utilizador\n7. Voltar\033[0m")
     while True:
         try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
@@ -142,7 +142,7 @@ def menu_gestao_utilizadores():
 
 def menuBilheteira():
     os.system('cls' if os.name == 'nt' else 'clear')# Limpa o terminal consoante o SO
-    print("\033[95m\033[1m\n-------- Menu Bilheteira --------\033[0m")
+    print("\033[95m\033[1m\n-------- Gestão de Bilheteira --------\033[0m")
     print_line()
     print(
         "\n\033[92m\033[1m1. Valor por dia \n2. Valor por mês\n3. Valor por ano \n4. Valor por espetáculo \n5. Valor por sessão\n6. Sair\033[0m")
