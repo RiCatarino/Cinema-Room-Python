@@ -224,11 +224,11 @@ def listar_espetaculos(readonly):
         while True:
             try:
                 option = view.pedir_escolha_espetaculo() #Pede a escolha do espetaculo ao user
-                if int(option)> 0:
+                if int(option) > 0:
                     selected = espetaculos[int(option) - 1] #converte em int
                     return selected
                 else:
-                    view.print_erro_input
+                    view.print_erro_input()
             except:
                 view.print_erro_input()
                 view.askforenter()
@@ -263,8 +263,8 @@ def listar_datas_espetaculo_para_reserva(espetaculo):
         view.print_line()
         while True:
             try:
+                option = view.pedir_escolha_data_espetaculo()
                 if int(option)> 0:
-                    option = view.pedir_escolha_data_espetaculo()
                     return datas[int(option) - 1]['id']
                 else:
                     view.print_erro_input()
