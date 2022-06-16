@@ -336,6 +336,9 @@ def print_username_tamanho():
 def print_password_tamanho():
     print("\n\033[91m\033[1mPor favor insira uma password.\033[0m")
 
+def print_espataculo_tamanho():
+    print("\n\033[91m\033[1mPor favor insira um nome para o espetáculo.\033[0m")
+
 
 def print_registo_admin_sucesso():
     print("\n\033[94m\033[1mNovo administrador registado com sucesso!\033[0m")
@@ -402,6 +405,7 @@ def print_sessoa_adicionada_sucesso():
 def print_erro_input():
         print("\033[91m\033[1mEssa opção não existe.\033[0m") # Se o input não for um número
     
+
 ##RESERVAS
 def print_sem_lugares_disponiveis():
     print("\033[91mNão existem lugares suficientes disponíveis.\033[0m")

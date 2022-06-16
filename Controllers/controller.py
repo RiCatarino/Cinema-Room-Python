@@ -200,15 +200,21 @@ def check_espetaculo_exists(nome):
 def inserir_espetaculo():
     while True:
         nome = view.pedir_nome_espetaculo() #Pede o nome do espetaculo ao user
-        if not check_espetaculo_exists(nome):
-            mod.inserir_espetaculo(nome) #chama a função no model para inserir o espetaculo na tabela "Espetaculos"
-            option = view.questao_novo_espetaculo() #Pergunta se pretende inserir datas para este novo espetaculo
-            if option == "Sim":
-                inserir_nova_data(nome) #Chama a função para inserir datas
+        if len(nome) > 0:
+            if not check_espetaculo_exists(nome):
+                mod.inserir_espetaculo(nome) #chama a função no model para inserir o espetaculo na tabela "Espetaculos"
+                while True:
+                    option = view.questao_novo_espetaculo() #Pergunta se pretende inserir datas para este novo espetaculo
+                    if option.upper() == "SIM":
+                        inserir_nova_data(nome) #Chama a função para inserir datas
+                    elif option.upper() == "NÃO":
+                        view.menu_espetaculos()
+                    else:
+                        view.print_erro_input()
             else:
-                view.menu_espetaculos()
+                view.print_erro_espetaculo_existe()
         else:
-            view.print_erro_espetaculo_existe()
+            view.print_espataculo_tamanho()
         
 
 def listar_espetaculos(readonly):
