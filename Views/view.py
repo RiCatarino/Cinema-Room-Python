@@ -330,6 +330,12 @@ def print_user_nao_existe():
 def print_user_existe():
     print("\n\033[91m\033[1mJá existe um utilizador com esse username.\033[0m")
     
+def print_username_tamanho():
+    print("\n\033[91m\033[1mPor favor insira um username.\033[0m")
+
+def print_password_tamanho():
+    print("\n\033[91m\033[1mPor favor insira uma password.\033[0m")
+
 
 def print_registo_admin_sucesso():
     print("\n\033[94m\033[1mNovo administrador registado com sucesso!\033[0m")

@@ -154,26 +154,34 @@ def login():
     if checkUserLogin(username, password): #Se as credenciais estiverem corretas
         if not check_user_isblocked(username):
             view.currentuser = username #atribui o utilizador atual ao username inserido
+            print(view.currentuser)
             if checkAdminLogin(username): #Verifica se é admin, se for encaminha para o menuadmin
                 view.menuAdmin()
             else:
+                view.askforenter()
                 view.menuUser() # se não, encaminha para o menuuser
         else:
             view.print_utilizador_bloqueado()
-            view.askforenter()
             view.menu_inicial()
     else:
         view.print_password_errada()
-        login() #volta a chamar a função caso o username ou a password estiverem incorretos
+        view.askforenter()
+        view.menu_inicial() #volta a chamar a função caso o username ou a password estiverem incorretos
 
 
 def signup(role):
     while True:
         username = view.pedir_username() #Pede username
+        while len(username) < 1:
+            view.print_username_tamanho()
+            username = view.pedir_username() #Pede username
         if check_user_exists(username):
             view.print_user_existe()
         else:
             password = view.pedir_password() #Pede a password
+            while len(password) < 1:
+                view.print_password_tamanho()
+                password = view.pedir_password() #Pede a password
             repeatpassword = view.pedir_repeat_nova_password() #Pede para confirmar a password
             while True:
                 if password == repeatpassword: #Enquanto as passwords forem diferentes, solicita a confirmação da password
@@ -183,6 +191,7 @@ def signup(role):
                 else:
                     view.print_password_diferentes()
                     repeatpassword = view.pedir_repeat_nova_password()
+
 
 def check_espetaculo_exists(nome):
     for item in cur.execute("SELECT * FROM Espetaculos"):
