@@ -58,7 +58,10 @@ def menuAdmin():
     print("\n\033[92m\033[1m1. Gestão de Espetáculos \n2. Gestão de Utilizadores\n3. Gestão de Bilheteira  \n4. Sair\033[0m")
     while True:
         try: # Tenta converter o input em int, se encontrar uma excepção(linha 82), dá print com o erro.
-            option = int(input("\n\033[1mOpção: \033[0m"))#Pede input ao utilizador e tenta converter em int
+            option = input("\n\033[1mOpção: \033[0m")#Pede input ao utilizador e tenta converter em int
+            if option.upper()  == "EXIT":
+                menu_inicial()
+            option = int(option)
             if option == 1:
                 menu_espetaculos()
             elif option ==2:
@@ -177,7 +180,10 @@ def menuUser():
         print_line()
         while True:
             try:
-                option = int(input("\n\033[1mOpção: \033[0m"))
+                option = input("\n\033[1mOpção: \033[0m")
+                if option.upper()  == "EXIT":
+                    menu_inicial()
+                option = int(option)
                 if option == 1:
                     cont.reservar_bilhetes(None, None)
                 elif option == 2:
@@ -211,7 +217,7 @@ def mostrar_sala():
     print("\t   |\t\t\t PALCO \t\t\t\t      |")
     print("\t   |\t\t\t\t\t\t\t      |")
     print("\t   |----------------------------------------------------------|\033[0m")
-    
+    print_precos()
 ##INPUT REQUESTS
 
 def askforenter():
@@ -439,6 +445,13 @@ def print_lista_reservas(i, mapa_reservas, reserva):
 
 def print_reserva_cancelada():
     print(f"\n\033[33m\033[1mReserva cancelada!\033[0m")
+    
+def print_precos():
+    print("\n\033[94m|---------------------------------------------------------------------|")
+    print("|\t\t\t\033[34mPreço Lugar Normal: \033[33m4€\t\t\t\033[94m      |")
+    print("|\t\t\t\033[34mPreço Lugar VIP:    \033[33m12€\t\t\t\033[94m      |")
+    print("\033[94m|---------------------------------------------------------------------|\033[0m")
+
 ## BILHETEIRA
 
 def print_total_bilheteira_dia(dia, mes, ano, total):
