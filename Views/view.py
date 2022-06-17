@@ -400,7 +400,7 @@ def print_lista_datas_para_reserva(i,datas):
     print(f"\t\033[92m\033[1m| {i + 1}: {datas[i]['data']} |\033[0m")
     
 def print_sem_datas():
-    print("\033[31m\nNão há datas para este evento.\033[0m")
+    print("\033[31m\nNão há datas para este espetáculo.\033[0m")
 
 def print_sucesso_remocao(espetaculo):
     print(f"\033[91m\033[1m\nEspetáculo '{espetaculo}' removido com sucesso!")
@@ -471,3 +471,6 @@ def print_total_bilheteira_sessao(data, espetaculo, total):
 
 def print_sucesso_remocao_sessao(data, espetaculo):
     print(f"\033[34m\033[1m\nA sessão na data {data} do espetáculo '{espetaculo}' foi removida com sucesso.\033[0m")
+
+def print_sem_datas_bilheteira():
+    print("\033[91m\033[1mNão existem sessões para a data inserida.")

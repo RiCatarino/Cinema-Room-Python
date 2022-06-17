@@ -677,10 +677,14 @@ def bilheteira_por_dia():
     for item in cur.execute( #seleciona as reservas na respetiva data
             f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}' AND strftime('%m', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{mes.zfill(2)}' AND strftime('%d', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{dia.zfill(2)}'"):
         datas.append(item[0])
-    total = get_total_bilheteira(datas) #Calcula os valores associados
-    view.print_total_bilheteira_dia(dia, mes, ano, total)
-    view.askforenter()
-    view.menuBilheteira()
+    if datas:
+        total = get_total_bilheteira(datas) #Calcula os valores associados
+        view.print_total_bilheteira_dia(dia, mes, ano, total)
+        view.askforenter()
+        view.menuBilheteira()
+    else:
+        view.print_sem_datas_bilheteira()
+        view.menuBilheteira()
 
 def bilheteira_por_mes():
     ano = view.pedir_ano()
@@ -689,10 +693,14 @@ def bilheteira_por_mes():
     for item in cur.execute(#seleciona as reservas na respetiva data
             f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}' AND strftime('%m', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{mes.zfill(2)}'"):
         datas.append(item[0])
-    total = get_total_bilheteira(datas)#Calcula os valores associados
-    view.print_total_bilheteira_mes(mes, ano, total)
-    view.askforenter()    
-    view.menuBilheteira()
+    if datas:
+        total = get_total_bilheteira(datas)#Calcula os valores associados
+        view.print_total_bilheteira_mes(mes, ano, total)
+        view.askforenter()    
+        view.menuBilheteira()
+    else:
+        view.print_sem_datas_bilheteira()
+        view.menuBilheteira()
 
 def bilheteira_por_ano():
     ano = view.pedir_ano()
@@ -701,21 +709,29 @@ def bilheteira_por_ano():
     for item in cur.execute(#seleciona as reservas na respetiva data
             f"SELECT id FROM Datas_espetaculo WHERE strftime('%Y', (substr(data,7,4) || '-' || substr(data,4,2) || '-' || substr(data,1,2)) )  ='{ano}'"):
         datas.append(item[0])
-    total = get_total_bilheteira(datas)#Calcula os valores associados
-    view.print_total_bilheteira_ano(ano, total)
-    view.askforenter()
-    view.menuBilheteira()
-
+    if datas:
+        total = get_total_bilheteira(datas)#Calcula os valores associados
+        view.print_total_bilheteira_ano(ano, total)
+        view.askforenter()
+        view.menuBilheteira()
+    else:
+        view.print_sem_datas_bilheteira()
+        view.menuBilheteira()
+        
 def bilheteira_por_espetaculo():
     espetaculo = listar_espetaculos(False) #PEDE O ESPETACULO
     datas = [] #LISTA PARA AS DATAS
     total = 0
     for item in cur.execute(f"SELECT id FROM Datas_espetaculo WHERE espetaculo='{espetaculo}'"): #SELECIONA AS DATAS DO RESPETIVO ESPETACULO
         datas.append(item[0])
-    total = get_total_bilheteira(datas)#Calcula os valores associados
-    view.print_total_bilheteira_espetaculo(espetaculo, total)
-    view.askforenter()
-    view.menuBilheteira()
+    if datas:
+        total = get_total_bilheteira(datas)#Calcula os valores associados
+        view.print_total_bilheteira_espetaculo(espetaculo, total)
+        view.askforenter()
+        view.menuBilheteira()
+    else:
+        view.print_sem_datas()
+        view.menuBilheteira()
 
 def bilheteira_por_sessao():
     espetaculo = listar_espetaculos(False) #PEDE O ESPETACULO
