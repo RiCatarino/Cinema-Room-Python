@@ -368,7 +368,7 @@ def print_desbloqueio_sucesso():
     print("\n\033[34m\033[1m------ Utilizador desbloqueado com sucesso ------\033[0m\n")
     
 def print_no_users_blocked():
-    print("\033[91m\033[1m\------ Não existem utilizadores bloqueados ------\033[0m\n")
+    print("\033[91m\033[1m------ Não existem utilizadores bloqueados ------\033[0m\n")
 
     
 ## DATAS E ESPETACULOS
