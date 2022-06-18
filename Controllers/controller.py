@@ -62,12 +62,10 @@ def bloquear_utilizador():
         
 
 def desbloquear_utilizador():
-    listar_utilizadores_bloqueados()
-    while True:
+    if listar_utilizadores_bloqueados(): # Verifica se a função retorna um valor True, se sim, continua
         username = view.pedir_username() #Pede o nome do user
         if check_user_exists(username): #Se existir
             if check_user_isblocked(username): #SE O UTILIZADOR ESTIVER BLOQUEADO
-                while True:
                     confirmacao = view.pedir_confirmacao_desbloquear(username)
                     if confirmacao.upper() == "SIM":
                         mod.desbloquear_utilizador(username)
@@ -82,6 +80,7 @@ def desbloquear_utilizador():
                 view.print_utilizador_naobloqueado()
         else:
             view.print_user_nao_existe()
+
 
 def verificar_data_duplicada(name, date):
     cur.execute(f"SELECT * FROM Datas_espetaculo WHERE data='{DateTime(date)}' AND espetaculo='{name}'") #Query para verificar se já existe a data para o respetivo espetaculo
@@ -315,9 +314,16 @@ def listar_utilizadores_ativos(): #Lista os utilizadores
         
 def listar_utilizadores_bloqueados():
     view.print_cabecalho_lista_users()
-    for user in cur.execute("SELECT username, blocked FROM Users WHERE role='User' AND blocked = 'True'"): #Query para selecionar todos os utilizador com o role "user"
+    users_blocked = cur.execute("SELECT username, blocked FROM Users WHERE role='User' AND blocked = 'True'")
+    if users_blocked.fetchone() is None:  # Se não existirem users bloqueados, retorna False
+        view.print_no_users_blocked()
+        return False
+    for user in users_blocked: #Query para selecionar todos os utilizador com o role "user"
         view.print_users(user)
         view.print_line()
+    return True
+
+
 def alterar_password_by_utilizador(username):
     listar_utilizadores_ativos()
     while True:
